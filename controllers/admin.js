@@ -99,6 +99,9 @@ exports.update = asyncHandler(async (req, res) => {
   });
 });
 
+// block and unblock super admin  admins
+
+
 exports.block = async (req, res) => {
   try {
     const admin = await adminModel.findById(req.params.id);

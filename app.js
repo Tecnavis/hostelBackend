@@ -9,6 +9,8 @@ var cors = require("cors");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require("./routes/admin");
+var ownerRouter = require("./routes/owner");
+
 
 
 var connectDB = require("./config/db");
@@ -41,6 +43,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admins', adminRouter);
+app.use('/owners', ownerRouter);
+
 
 
 // catch 404 and forward to error handler
