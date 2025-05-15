@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 //create admin
 exports.create = asyncHandler(async (req, res) => {
-  const { name, email, password, phone, role } = req.body;
+  const { name, email, password, phone, role, superAdminId } = req.body;
 
   if (!name || !email || !password || !phone || !role) {
     return res.status(400).json({ message: "Please add all fields" });
@@ -29,6 +29,7 @@ exports.create = asyncHandler(async (req, res) => {
     password: hashedPassword,
     role,
     phone,
+    ...(role === "admin" && { superAdminId }),
   });
 
   if (admin) {
@@ -38,22 +39,26 @@ exports.create = asyncHandler(async (req, res) => {
   }
 });
 
-
 // get all
 exports.getAll = asyncHandler(async (req, res) => {
-  const admin = await adminModel.find({ role: "Admin" });
+  const admin = await adminModel.find({
+    superAdminId: req.params.id,
+    role: "admin",
+  });
   res.status(200).json(admin);
 });
 
 //get by Id
 exports.get = asyncHandler(async (req, res) => {
-  const admin = await adminModel.findById(req.params.id);
+  const admin = await adminModel
+    .findById(req.params.id)
+    .populate("superAdminId");
   res.status(200).json(admin);
 });
 
 //delete admin
 exports.delete = asyncHandler(async (req, res) => {
-  await adminModel.findByIdAndDelete(req.params.id);
+  await adminModel.find(req.params.id);
   res.status(200).json({ message: "Admin deleted" });
 });
 
@@ -62,7 +67,7 @@ exports.update = asyncHandler(async (req, res) => {
   const { name, email, phone, role } = req.body;
 
   // const image = req.file?.filename;
-  const image = req.cloudinaryImageUrl
+  const image = req.cloudinaryImageUrl;
 
   const admin = await adminModel.findById(req.params.id);
 
@@ -81,19 +86,15 @@ exports.update = asyncHandler(async (req, res) => {
   // Update only the fields provided
   if (name) admin.name = name;
   if (email) admin.email = email;
-  if (phone) admin.phone = district;
+  if (phone) admin.phone = phone;
   if (role) admin.role = role;
   if (image) admin.image = image;
 
   const updatedadmin = await admin.save();
 
-  res
-    .status(200)
-    .json({
-      message: "Admin updated successfully",
-      admin: updatedadmin,
-      status: 200,
-    });
+  res.status(200).json({
+    message: "Admin updated successfully",
+    admin: updatedadmin,
+    status: 200,
+  });
 });
-
-
