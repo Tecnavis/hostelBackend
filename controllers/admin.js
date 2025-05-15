@@ -58,7 +58,7 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete admin
 exports.delete = asyncHandler(async (req, res) => {
-  await adminModel.find(req.params.id);
+  await adminModel.findByIdAndDelete(req.params.id);
   res.status(200).json({ message: "Admin deleted" });
 });
 
