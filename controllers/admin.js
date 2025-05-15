@@ -98,3 +98,21 @@ exports.update = asyncHandler(async (req, res) => {
     status: 200,
   });
 });
+
+exports.block = async (req, res) => {
+  try {
+    const admin = await adminModel.findById(req.params.id);
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    admin.isActive = !admin.isActive;
+
+    await admin.save();
+    res.json(admin);
+  } catch (error) {
+    console.error("Error in Block admin:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

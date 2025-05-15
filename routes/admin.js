@@ -5,11 +5,11 @@ const { uploadImageSingle } = require('../lib/multer');
 
 
 router.post('/',  Controller.create); 
-router.get('/', Controller.getAll);
+router.get('/super-admins/:id', Controller.getAll);
 router.get('/:id', Controller.get);
 router.put('/:id', uploadImageSingle, Controller.update);
 router.delete('/:id', Controller.delete);
-// router.post("/login", Controller.login);
+router.patch("/block/:id", Controller.block);
 // router.put("/logout/:id", Controller.logout);
 
 
