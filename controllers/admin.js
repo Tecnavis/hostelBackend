@@ -59,7 +59,7 @@ exports.get = asyncHandler(async (req, res) => {
 //delete admin
 exports.delete = asyncHandler(async (req, res) => {
   await adminModel.findByIdAndDelete(req.params.id);
-  res.status(200).json({ message: "Admin deleted" });
+  res.status(200).json({ message: "Admin deleted",  status: 200 });
 });
 
 // Update admin (partial update)
@@ -105,7 +105,7 @@ exports.update = asyncHandler(async (req, res) => {
 exports.block = async (req, res) => {
   try {
     const admin = await adminModel.findById(req.params.id);
-
+    
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
@@ -113,7 +113,7 @@ exports.block = async (req, res) => {
     admin.isActive = !admin.isActive;
 
     await admin.save();
-    res.json(admin);
+    res.json({ admin , status: 200 });
   } catch (error) {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });

@@ -5,6 +5,7 @@ const { uploadImageSingle } = require('../lib/multer');
 
 
 router.post('/',  Controller.create); 
+router.get("/", Controller.getAllOwner);
 router.get('/super-owner/:id', Controller.getAll);
 router.get('/:id', Controller.get);
 router.put('/:id', uploadImageSingle, Controller.update);

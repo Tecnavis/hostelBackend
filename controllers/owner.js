@@ -61,12 +61,21 @@ exports.create = asyncHandler(async (req, res) => {
   }
 });
 
-// get all
+// get all owners 
+exports.getAllOwner = asyncHandler(async (req, res) => {
+  const owner = await ownerModel.find({
+    role: "owner",
+  });
+  res.status(200).json(owner);
+});
+
+// get all owner under staff
 exports.getAll = asyncHandler(async (req, res) => {
   const owner = await ownerModel.find({
     ownerId: req.params.id,
-    role: "owner",
+    role: "staff",
   });
+  
   res.status(200).json(owner);
 });
 
@@ -81,7 +90,7 @@ exports.get = asyncHandler(async (req, res) => {
 //delete owner
 exports.delete = asyncHandler(async (req, res) => {
   await ownerModel.findByIdAndDelete(req.params.id);
-  res.status(200).json({ message: "Owner deleted" });
+  res.status(200).json({ message: "Owner deleted", status: 200 });
 });
 
 // Update owner (partial update)
@@ -151,7 +160,7 @@ exports.block = async (req, res) => {
     owner.isActive = !owner.isActive;
 
     await owner.save();
-    res.json(owner);
+    res.json({owner, status: 200 });
   } catch (error) {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });
