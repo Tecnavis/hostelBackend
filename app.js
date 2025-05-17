@@ -10,6 +10,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require("./routes/admin");
 var ownerRouter = require("./routes/owner");
+var hostelRouter = require("./routes/hostel");
+
 
 
 
@@ -44,6 +46,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admins', adminRouter);
 app.use('/owners', ownerRouter);
+app.use('/hostels', hostelRouter);
+
 
 
 

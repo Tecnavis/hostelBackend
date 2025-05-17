@@ -5,11 +5,7 @@ const ownerSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    ownerName: {
-      type: String,
-      required: true,
-    },
-    hostelName: {
+    name: {
       type: String,
       required: true,
     },
@@ -22,12 +18,7 @@ const ownerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    ownerPhone: {
-      type: String,
-      unique: true,
-      required: true,
-    },
-    hostelPhone: {
+    phone: {
       type: String,
       unique: true,
       required: true,
@@ -37,20 +28,12 @@ const ownerSchema = new mongoose.Schema(
       enum: ["owner", "staff"],
       required: true,
     },
-    location: {
-      street: { type: String, required: true },
-      place: { type: String, required: true },
-      pincode: { type: String, required: true },
-    },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Owner",
       required: function () {
         return this.role === "staff";
       },
-    },
-    gst: {
-      type: String,
     },
     hostelIds: [
       {

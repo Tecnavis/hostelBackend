@@ -5,26 +5,20 @@ const bcrypt = require("bcrypt");
 //create owner
 exports.create = asyncHandler(async (req, res) => {
   const {
-    ownerName,
-    hostelName,
+    name,
     email,
     password,
-    ownerPhone,
-    hostelPhone,
+    phone,
     role,
-    location,
     ownerId,
   } = req.body;
 
   if (
-    !ownerName ||
-    !hostelName ||
-    !ownerPhone ||
-    !hostelPhone ||
+    !name ||
+    !phone ||
     !email ||
     !password ||
-    !role ||
-    !location
+    !role 
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -43,14 +37,11 @@ exports.create = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const owner = await ownerModel.create({
-    ownerName,
-    hostelName,
-    ownerPhone,
-    hostelPhone,
+    name,
+    phone,
     email,
     password: hashedPassword,
     role,
-    location,
     ...(role === "staff" && { ownerId }),
   });
 
@@ -96,14 +87,10 @@ exports.delete = asyncHandler(async (req, res) => {
 // Update owner (partial update)
 exports.update = asyncHandler(async (req, res) => {
   const {
-    ownerName,
-    hostelName,
+    name,
     email,
-    ownerPhone,
-    hostelPhone,
+    phone,
     role,
-    location,
-     gst
   } = req.body;
 
   // const image = req.file?.filename;
@@ -124,19 +111,17 @@ exports.update = asyncHandler(async (req, res) => {
   }
 
   // Update only the fields provided
-  if (ownerName) owner.ownerName = ownerName;
-  if (hostelName) owner.hostelName = hostelName;
-  if (ownerPhone) owner.ownerPhone = ownerPhone;
-  if (hostelPhone) owner.hostelPhone = hostelPhone;
+  if (name) owner.name = name;
+  if (phone) owner.phone = hostelPhone;
   if (email) owner.email = email;
   if (role) owner.role = role;
   if (image) owner.image = image;
-  if(gst) owner.gst = gst;
-  if (location) {
-    if (location.street) owner.location.street = location.street;
-    if (location.place) owner.location.place = location.place;
-    if (location.pincode) owner.location.pincode = location.pincode;
-  }
+  // if(gst) owner.gst = gst;
+  // if (location) {
+  //   if (location.street) owner.location.street = location.street;
+  //   if (location.place) owner.location.place = location.place;
+  //   if (location.pincode) owner.location.pincode = location.pincode;
+  // }
 
   const updatedowner = await owner.save();
 
