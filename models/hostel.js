@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const hostelSchema = new mongoose.Schema(
   {
-    name: { String },
+    name: { type: String, required: true  },
     location: {
       street: { type: String, required: true },
       place: { type: String, required: true },

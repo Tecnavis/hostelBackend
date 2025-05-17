@@ -5,6 +5,7 @@ const asyncHandler = require("express-async-handler");
 exports.create = asyncHandler(async (req, res) => {
   const { name, phone, location, description, amenities, category, ownerId } =
     req.body;
+    
 
   if ( !name || !phone || !location || !description || !amenities || !category || !ownerId ) {
     return res.status(400).json({ message: "Please add all fields" });
@@ -37,7 +38,8 @@ exports.create = asyncHandler(async (req, res) => {
 
 // get all hostels
 exports.getAllhostel = asyncHandler(async (req, res) => {
-  const hostel = await hostelModel.find();
+  const hostel = await hostelModel.find().populate("ownerId");
+;
   res.status(200).json(hostel);
 });
 
