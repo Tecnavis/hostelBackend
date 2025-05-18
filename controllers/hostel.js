@@ -97,7 +97,6 @@ exports.update = asyncHandler(async (req, res) => {
   if (phone) hostel.phone = phone;
   if (gst) hostel.gst = gst;
   if (description) hostel.description = description;
-  if (image) hostel.image = image;
   if (category) hostel.category = category;
   if (ownerId) hostel.ownerId = ownerId;
   if (location) {
