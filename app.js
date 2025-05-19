@@ -27,7 +27,7 @@ var app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:7867"],
+  origin: ["http://localhost:5173", "http://localhost:7867", "https://hostel-dashboard-48qp.onrender.com"],
   methods: ["PUT", "DELETE", "POST", "GET", "PATCH"],
   credentials: true
 }));
