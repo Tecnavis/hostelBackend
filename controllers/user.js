@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 //create user
 exports.create = asyncHandler(async (req, res) => {
-  const { name, email, password, district, standard, phone } = req.body;
+  const { name, email, password,  phone } = req.body;
 
   if (!name || !email || !password ||!phone) {
     return res.status(400).json({ message: "Please add all fields" });
@@ -125,8 +125,8 @@ exports.update = asyncHandler(async (req, res) => {
   if (name) user.name = name;
   if (email) user.email = email;
   if (proof) {
-    if (proof.frond) user.proof.frond = proof.frond;
-    if (proof.back) user.proof.back = proof.back;
+    if (proof.frond) user.proof.frond = image;
+    if (proof.back) user.proof.back = image;
   }
   if (image) user.image = image;
   if(phone) user.phone = phone;

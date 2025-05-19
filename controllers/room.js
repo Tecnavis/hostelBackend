@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 
 //create room
 exports.create = asyncHandler(async (req, res) => {
-  const { roomNumber, capacity, price, currentOccupancy, features, hostelId } =
+  const { roomNumber, capacity, price, currentOccupancy, features, hostelId, roomType, charge, gardianInfo, visitTimes, payment } =
     req.body;
 
   if (
@@ -63,10 +63,10 @@ exports.getAllroom = asyncHandler(async (req, res) => {
 });
 
 // // get all room under owner
-// exports.getAll = asyncHandler(async (req, res) => {
-//   const room = await roomModel.find({ ownerId: req.params.id });
-//   res.status(200).json(room);
-// });
+exports.getAll = asyncHandler(async (req, res) => {
+  const room = await roomModel.find({ hostelId: req.params.id });
+  res.status(200).json(room);
+});
 
 //get by Id
 exports.get = asyncHandler(async (req, res) => {
