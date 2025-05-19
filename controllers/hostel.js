@@ -3,11 +3,11 @@ const asyncHandler = require("express-async-handler");
 
 //create hostel
 exports.create = asyncHandler(async (req, res) => {
-  const { name, phone, location, description, amenities, category, ownerId } =
+  const { name, phone, location, description, amenities, category, ownerId, accommodationType, price } =
     req.body;
     
 
-  if ( !name || !phone || !location || !description || !amenities || !category || !ownerId ) {
+  if ( !name || !phone || !location || !description || !amenities || !category || !ownerId || !accommodationType || !price ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 
@@ -26,6 +26,8 @@ exports.create = asyncHandler(async (req, res) => {
     amenities,
     category,
     ownerId,
+    accommodationType,
+    price,
      photos: images
   });
 

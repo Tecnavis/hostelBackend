@@ -17,9 +17,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    proof: [{
-        type: String
-    }],
+    proof: {
+        frond: {type: String},
+        back: {type: String}
+    },
     phone: {
          type: String,
          unique: true 

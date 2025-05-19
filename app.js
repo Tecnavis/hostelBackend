@@ -7,7 +7,7 @@ var cors = require("cors");
 
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var userRouter = require('./routes/user');
 var adminRouter = require("./routes/admin");
 var ownerRouter = require("./routes/owner");
 var hostelRouter = require("./routes/hostel");
@@ -45,7 +45,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/users', userRouter);
 app.use('/admins', adminRouter);
 app.use('/owners', ownerRouter);
 app.use('/hostels', hostelRouter);

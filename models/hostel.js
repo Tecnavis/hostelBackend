@@ -15,17 +15,18 @@ const hostelSchema = new mongoose.Schema(
     },
     gst: { type: String },
     photos: [String],
-    description: { String },
+    accommodationType: {type: String, required: true},
+    description: { type: String, required: true },
     amenities: [String], // e.g., ['WiFi', 'Laundry', 'Parking']
     category: {
       type: String,
-      enum: ["boys", "girls", "co-ed", "family"],
       required: true,
     },
-
+    price: {type: String, required: true},
     ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "Owner" },
     roomsId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
     isAvailable: { type: Boolean, default: true },
+    rating:{type: Number},
     isDelete: {
       type: Boolean,
       default: false,

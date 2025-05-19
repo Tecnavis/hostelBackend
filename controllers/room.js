@@ -13,7 +13,12 @@ exports.create = asyncHandler(async (req, res) => {
     !price ||
     !currentOccupancy ||
     !features ||
-    !hostelId
+    !hostelId ||
+    !roomType ||
+    !charge ||
+    !payment ||
+    !gardianInfo ||
+    !visitTimes
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -35,6 +40,11 @@ exports.create = asyncHandler(async (req, res) => {
     features,
     hostelId,
     photos: images,
+    roomType,
+    charge, 
+    payment, 
+    gardianInfo, 
+    visitTimes
   });
 
   if (room) {
