@@ -8,6 +8,10 @@ const reviewSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    },
+     roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Room"
     }
 
 }, { timestamps: true });
