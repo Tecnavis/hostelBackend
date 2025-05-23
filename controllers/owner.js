@@ -1,6 +1,7 @@
 const ownerModel = require("../models/owner");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 //create owner
 exports.create = asyncHandler(async (req, res) => {
@@ -49,6 +50,52 @@ exports.create = asyncHandler(async (req, res) => {
     return res.status(201).json({ message: "Owner created", status: 201 });
   } else {
     return res.status(400).json({ message: "Owner not created" });
+  }
+});
+
+
+exports.login = asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const owner = await ownerModel.findOne({
+      email: email,
+    });
+
+    if (!owner) {
+      return res
+        .status(400)
+        .json({ invalid: true, message: "Invalid email or password" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, owner.password);
+
+    if (isPasswordMatch) {
+      const token = jwt.sign(
+        { email: owner.email, id: owner._id },
+        "myjwtsecretkey",
+        { expiresIn: "1h" }
+      );
+
+      const ownerDetails = {
+        name: owner.name,
+        email: owner.email,
+        _id: owner._id,
+        phone: owner.phone,
+        image: owner?.image,
+        role: owner.role,
+      };
+      
+
+      return res.status(200).json({ token, ownerDetails, status: 200 });
+    } else {
+      return res
+        .status(400)
+        .json({ invalid: true, message: "Invalid email or password" });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error, please try again" });
   }
 });
 

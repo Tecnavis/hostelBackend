@@ -1,6 +1,7 @@
 const adminModel = require("../models/admin");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 //create admin
 exports.create = asyncHandler(async (req, res) => {
@@ -30,12 +31,57 @@ exports.create = asyncHandler(async (req, res) => {
     role,
     phone,
     ...(role === "admin" && { superAdminId }),
-  });
+  });adminModel
 
   if (admin) {
     return res.status(201).json({ message: "Admin created", status: 201 });
   } else {
     return res.status(400).json({ message: "Admin not created" });
+  }
+});
+
+
+exports.login = asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const admin = await adminModel.findOne({
+      email: email,
+    });
+
+    if (!admin) {
+      return res
+        .status(400)
+        .json({ invalid: true, message: "Invalid email or password" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, admin.password);
+
+    if (isPasswordMatch) {
+      const token = jwt.sign(
+        { email: admin.email, id: user._id },
+        "myjwtsecretkey",
+        { expiresIn: "1h" }
+      );
+
+      const adminDetails = {
+        name: admin.name,
+        email: admin.email,
+        _id: admin._id,
+        phone: admin.phone,
+        image: admin?.image,
+        role: admin.role,
+      };
+
+      return res.status(200).json({ token, adminDetails, status: 200 });
+    } else {
+      return res
+        .status(400)
+        .json({ invalid: true, message: "Invalid email or password" });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error, please try again" });
   }
 });
 

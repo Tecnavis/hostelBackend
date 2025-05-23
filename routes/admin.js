@@ -10,7 +10,7 @@ router.get('/:id', Controller.get);
 router.put('/:id', uploadImageSingle, Controller.update);
 router.delete('/:id', Controller.delete);
 router.patch("/block/:id", Controller.block);
-// router.put("/logout/:id", Controller.logout);
+router.post("/login", Controller.login);
 
 
 
