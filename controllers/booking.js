@@ -1,0 +1,117 @@
+const bookingModel = require("../models/booking");
+const asyncHandler = require("express-async-handler");
+
+//create booking
+exports.create = asyncHandler(async (req, res) => {
+  const { userId, roomId,  checkInDate, checkOutDate } =
+    req.body;
+    
+    
+  if ( !userId || !roomId ||  !checkInDate || !checkOutDate ) {
+    return res.status(400).json({ message: "Please add all fields" });
+  }
+
+  const booking = await bookingModel.create({
+     userId, roomId,  checkInDate, checkOutDate
+  });
+
+  if (booking) {
+    return res.status(201).json({ message: "booking created", status: 201 });
+  } else {
+    return res.status(400).json({ message: "booking not created" });
+  }
+});
+
+
+// get all superadmin booking
+
+exports.getAllSuperAdminBookings = asyncHandler(async (req, res) => {
+  const bookings = await bookingModel.find()
+    .populate({
+      path: 'roomId',
+      populate: {
+        path: 'hostelId',
+        populate: {
+          path: 'superAdminId', 
+        },
+      },
+    });
+
+  // Filter bookings where superAdminId matches the request param
+  const filtered = bookings.filter(
+    booking => booking.roomId?.hostelId?.superAdminId?.toString() === req.params.id
+  );
+
+  res.status(200).json(filtered);
+});
+
+
+
+// get all bookings
+exports.getAllbooking = asyncHandler(async (req, res) => {
+  const booking = await bookingModel.find().populate("roomId");
+;
+  res.status(200).json(booking);
+});
+
+// get all booking under owner
+exports.getAll = asyncHandler(async (req, res) => {
+ const bookings = await bookingModel.find()
+    .populate({
+      path: 'roomId',
+      populate: {
+        path: 'hostelId',
+        populate: {
+          path: 'ownerId', 
+        },
+      },
+    });
+
+  // Filter bookings where superAdminId matches the request param
+  const filtered = bookings.filter(
+    booking => booking.roomId?.hostelId?.ownerId?.toString() === req.params.id
+  );
+
+  res.status(200).json(filtered);
+});
+
+//get by Id
+exports.get = asyncHandler(async (req, res) => {
+  const booking = await bookingModel
+    .findById(req.params.id)
+    .populate("userId roomId");
+  res.status(200).json(booking);
+});
+
+//delete booking
+exports.delete = asyncHandler(async (req, res) => {
+  await bookingModel.findByIdAndDelete(req.params.id);
+  res.status(200).json({ message: "booking deleted", status: 200 });
+});
+
+// Update booking (partial update)
+exports.update = asyncHandler(async (req, res) => {
+  const {  checkInDate,  checkOutDate, status,  paymentStatus } = req.body;
+
+  const booking = await bookingModel.findById(req.params.id);
+
+  if (!booking) {
+    return res.status(404).json({ message: "booking not found" });
+  }
+
+
+  if ( checkInDate ) booking.checkInDate =  checkInDate;
+  if ( checkOutDate ) booking.checkOutDate = checkOutDate;
+  if (status) booking.status = status;
+  if (paymentStatus ) booking.paymentStatus  = paymentStatus;
+ 
+
+  const updatedbooking = await booking.save();
+
+  res.status(200).json({
+    message: "booking updated successfully",
+    booking: updatedbooking,
+    status: 200,
+  });
+});
+

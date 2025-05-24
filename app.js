@@ -13,6 +13,8 @@ var ownerRouter = require("./routes/owner");
 var hostelRouter = require("./routes/hostel");
 var roomRouter = require("./routes/room");
 var reviewRouter = require("./routes/review");
+var bookingRouter = require("./routes/booking");
+
 
 
 
@@ -50,8 +52,7 @@ app.use('/owners', ownerRouter);
 app.use('/hostels', hostelRouter);
 app.use('/rooms', roomRouter);
 app.use('/reviews', reviewRouter);
-
-
+app.use('/bookings', bookingRouter);
 
 
 

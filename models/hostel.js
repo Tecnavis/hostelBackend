@@ -64,14 +64,3 @@ const hostelSchema = new mongoose.Schema(
 
 module.exports = mongoose.model("Hostel", hostelSchema);
 
-// const bookingSchema = new mongoose.Schema({
-//   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-//   hostel: { type: mongoose.Schema.Types.ObjectId, ref: 'Hostel' },
-//   room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
-//   checkInDate: Date,
-//   checkOutDate: Date,
-//   status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
-//   paymentStatus: { type: String, enum: ['paid', 'unpaid'], default: 'unpaid' }
-// }, { timestamps: true });
-
-// export default mongoose.model('Booking', bookingSchema);
