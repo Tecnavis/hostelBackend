@@ -7,11 +7,12 @@ const { uploadImageSingle, uploadImageArray } = require('../lib/multer');
 router.post('/', uploadImageArray, Controller.create); 
 router.get("/", Controller.getAllhostel);
 router.get('/owner/:id', Controller.getAll);
+router.get('/super-admin/:id', Controller.getAllSuperAdminOwner);
 router.get('/:id', Controller.get);
 router.put('/:id', uploadImageSingle, Controller.update);
 router.delete('/:id', Controller.delete);
 router.patch("/block/:id", Controller.block);
-// router.put("/logout/:id", Controller.logout);
+router.put("/ratings/:id", Controller.updateRating);
 
 
 

@@ -28,6 +28,11 @@ const ownerSchema = new mongoose.Schema(
       enum: ["owner", "staff"],
       required: true,
     },
+    superAdminId: {
+       type: mongoose.Schema.Types.ObjectId,
+        ref: "Admin",
+        required: true
+    },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Owner",

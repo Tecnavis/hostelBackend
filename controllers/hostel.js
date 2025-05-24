@@ -3,10 +3,11 @@ const asyncHandler = require("express-async-handler");
 
 //create hostel
 exports.create = asyncHandler(async (req, res) => {
-  const { name, phone, location, description, amenities, category, ownerId, accommodationType, price } =
+  const { name, phone, location, description, amenities, category, ownerId, accommodationType, price, superAdminId } =
     req.body;
     
-  if ( !name || !phone || !location || !description || !amenities || !category || !ownerId || !accommodationType || !price ) {
+    
+  if ( !name || !phone || !location || !description || !amenities || !category || !ownerId || !accommodationType || !price || !superAdminId) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 
@@ -27,6 +28,7 @@ exports.create = asyncHandler(async (req, res) => {
     ownerId,
     accommodationType,
     price,
+    superAdminId,
      photos: images
   });
 
@@ -36,6 +38,17 @@ exports.create = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "hostel not created" });
   }
 });
+
+
+// get all superadmin hostel
+
+exports.getAllSuperAdminOwner = asyncHandler(async (req, res) => {
+  const owner = await hostelModel.find({
+    superAdminId: req.params.id,
+  }).populate("ownerId");
+  res.status(200).json(owner);
+});
+
 
 // get all hostels
 exports.getAllhostel = asyncHandler(async (req, res) => {
@@ -134,5 +147,53 @@ exports.block = async (req, res) => {
   } catch (error) {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
+
+// Update rating 
+
+exports.updateRating = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, ratingValue } = req.body;
+
+    if (!ratingValue || ratingValue < 1 || ratingValue > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    const hostel = await hostelModel.findById(id);
+    if (!hostel) {
+      return res.status(404).json({ message: 'Room not found' });
+    }
+
+    // Check if user already rated
+    const existingRating = hostel.rating.details.find((r) =>
+      r.userId.toString() === userId.toString()
+    );
+
+    if (existingRating) {
+      // Update rating
+      existingRating.value = ratingValue;
+    } else {
+      // Add new rating
+      hostel.rating.details.push({ userId, value: ratingValue });
+      hostel.rating.count += 1;
+    }
+
+    // Recalculate average
+    const total = room.rating.details.reduce((sum, r) => sum + r.value, 0);
+    hostel.rating.average = parseFloat((total / hostel.rating.details.length).toFixed(2));
+
+    await hostel.save();
+
+    res.status(200).json({
+      message: 'Room rating updated successfully',
+      rating: hostel.rating,
+    });
+  } catch (error) {
+    console.error('Rating error:', error);
+    res.status(500).json({ message: 'Server error', error });
   }
 };

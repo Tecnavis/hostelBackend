@@ -12,6 +12,7 @@ exports.create = asyncHandler(async (req, res) => {
     phone,
     role,
     ownerId,
+     superAdminId,
   } = req.body;
 
   if (
@@ -19,7 +20,8 @@ exports.create = asyncHandler(async (req, res) => {
     !phone ||
     !email ||
     !password ||
-    !role 
+    !role ||
+    !superAdminId
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -43,6 +45,7 @@ exports.create = asyncHandler(async (req, res) => {
     email,
     password: hashedPassword,
     role,
+    superAdminId,
     ...(role === "staff" && { ownerId }),
   });
 
@@ -84,6 +87,7 @@ exports.login = asyncHandler(async (req, res) => {
         phone: owner.phone,
         image: owner?.image,
         role: owner.role,
+        superAdminId: owner?.superAdminId,
       };
       
 
@@ -98,6 +102,17 @@ exports.login = asyncHandler(async (req, res) => {
     return res.status(500).json({ error: "Server error, please try again" });
   }
 });
+
+// get all superadmin owners 
+
+exports.getAllSuperAdminOwner = asyncHandler(async (req, res) => {
+  const owner = await ownerModel.find({
+    superAdminId: req.params.id,
+    role: "owner",
+  });
+  res.status(200).json(owner);
+});
+
 
 // get all owners 
 exports.getAllOwner = asyncHandler(async (req, res) => {

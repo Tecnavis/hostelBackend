@@ -31,7 +31,8 @@ exports.create = asyncHandler(async (req, res) => {
     role,
     phone,
     ...(role === "admin" && { superAdminId }),
-  });adminModel
+  });
+  adminModel;
 
   if (admin) {
     return res.status(201).json({ message: "Admin created", status: 201 });
@@ -39,7 +40,6 @@ exports.create = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Admin not created" });
   }
 });
-
 
 exports.login = asyncHandler(async (req, res) => {
   try {
@@ -59,7 +59,7 @@ exports.login = asyncHandler(async (req, res) => {
 
     if (isPasswordMatch) {
       const token = jwt.sign(
-        { email: admin.email, id: user._id },
+        { email: admin.email, id: admin._id },
         "myjwtsecretkey",
         { expiresIn: "1h" }
       );
@@ -71,6 +71,7 @@ exports.login = asyncHandler(async (req, res) => {
         phone: admin.phone,
         image: admin?.image,
         role: admin.role,
+        superAdminId: admin?.superAdminId,
       };
 
       return res.status(200).json({ token, adminDetails, status: 200 });
@@ -105,7 +106,7 @@ exports.get = asyncHandler(async (req, res) => {
 //delete admin
 exports.delete = asyncHandler(async (req, res) => {
   await adminModel.findByIdAndDelete(req.params.id);
-  res.status(200).json({ message: "Admin deleted",  status: 200 });
+  res.status(200).json({ message: "Admin deleted", status: 200 });
 });
 
 // Update admin (partial update)
@@ -147,11 +148,10 @@ exports.update = asyncHandler(async (req, res) => {
 
 // block and unblock super admin  admins
 
-
 exports.block = async (req, res) => {
   try {
     const admin = await adminModel.findById(req.params.id);
-    
+
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
@@ -159,7 +159,7 @@ exports.block = async (req, res) => {
     admin.isActive = !admin.isActive;
 
     await admin.save();
-    res.json({ admin , status: 200 });
+    res.json({ admin, status: 200 });
   } catch (error) {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });

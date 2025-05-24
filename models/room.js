@@ -22,6 +22,25 @@ const roomSchema = new mongoose.Schema(
       phone: { type: String },
     },
     visitTimes: [String],
+    rating: {
+      average: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+      details: [
+        {
+          userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+          },
+          value: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 5,
+          },
+        },
+      ],
+    },
     isDelete: {
       type: Boolean,
       default: false,

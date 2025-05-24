@@ -156,3 +156,51 @@ exports.block = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
+
+// Update rating 
+
+exports.updateRating = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, ratingValue } = req.body;
+
+    if (!ratingValue || ratingValue < 1 || ratingValue > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    const room = await roomModel.findById(id);
+    if (!room) {
+      return res.status(404).json({ message: 'Room not found' });
+    }
+
+    // Check if user already rated
+    const existingRating = room.rating.details.find((r) =>
+      r.userId.toString() === userId.toString()
+    );
+
+    if (existingRating) {
+      // Update rating
+      existingRating.value = ratingValue;
+    } else {
+      // Add new rating
+      room.rating.details.push({ userId, value: ratingValue });
+      room.rating.count += 1;
+    }
+
+    // Recalculate average
+    const total = room.rating.details.reduce((sum, r) => sum + r.value, 0);
+    room.rating.average = parseFloat((total / room.rating.details.length).toFixed(2));
+
+    await room.save();
+
+    res.status(200).json({
+      message: 'Room rating updated successfully',
+      rating: room.rating,
+    });
+  } catch (error) {
+    console.error('Rating error:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};

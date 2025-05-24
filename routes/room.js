@@ -11,7 +11,7 @@ router.get('/:id', Controller.get);
 router.put('/:id', uploadImageSingle, Controller.update);
 router.delete('/:id/hostels/:hostelId', Controller.delete);
 router.patch("/block/:id", Controller.block);
-// router.put("/logout/:id", Controller.logout);
+router.put("/ratings/:id", Controller.updateRating);
 
 
 
