@@ -33,6 +33,14 @@ exports.getAllSuperAdminBookings = asyncHandler(async (req, res) => {
       path: 'hostelId',
       match: { superAdminId: superAdminId },
       model: 'Hostel',
+    })
+     .populate({
+      path: 'roomId',
+      model: 'Room', 
+    })
+      .populate({
+      path: 'userId',
+      model: 'User', 
     });
 
   // Filter only bookings where hostelId was successfully populated
@@ -59,7 +67,16 @@ exports.getAll = asyncHandler(async (req, res) => {
       path: 'hostelId',
       match: { ownerId: ownerId },
       model: 'Hostel',
+    })
+     .populate({
+      path: 'roomId',
+      model: 'Room', 
+    })
+      .populate({
+      path: 'userId',
+      model: 'User', 
     });
+
 
   // Filter only bookings where hostelId was successfully populated
   const filteredBookings = bookings.filter(booking => booking.hostelId);
@@ -83,7 +100,7 @@ exports.delete = asyncHandler(async (req, res) => {
 
 // Update booking (partial update)
 exports.update = asyncHandler(async (req, res) => {
-  const {  checkInDate,  checkOutDate, status,  paymentStatus } = req.body;
+  const {  checkInDate,  checkOutDate, status,  paymentStatus } = req.body;  
 
   const booking = await bookingModel.findById(req.params.id);
 

@@ -31,7 +31,6 @@ const ownerSchema = new mongoose.Schema(
     superAdminId: {
        type: mongoose.Schema.Types.ObjectId,
         ref: "Admin",
-        required: true
     },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,

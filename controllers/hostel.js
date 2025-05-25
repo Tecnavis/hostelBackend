@@ -7,7 +7,7 @@ exports.create = asyncHandler(async (req, res) => {
     req.body;
     
     
-  if ( !name || !phone || !location || !description || !amenities || !category || !ownerId || !accommodationType || !price || !superAdminId) {
+  if ( !name || !phone || !location || !description || !amenities || !category || !ownerId || !accommodationType || !price ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 

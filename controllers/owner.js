@@ -5,24 +5,10 @@ const jwt = require("jsonwebtoken");
 
 //create owner
 exports.create = asyncHandler(async (req, res) => {
-  const {
-    name,
-    email,
-    password,
-    phone,
-    role,
-    ownerId,
-     superAdminId,
-  } = req.body;
+  const { name, email, password, phone, role, ownerId, superAdminId } =
+    req.body;
 
-  if (
-    !name ||
-    !phone ||
-    !email ||
-    !password ||
-    !role ||
-    !superAdminId
-  ) {
+  if (!name || !phone || !email || !password || !role ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 
@@ -56,7 +42,6 @@ exports.create = asyncHandler(async (req, res) => {
   }
 });
 
-
 exports.login = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -87,9 +72,9 @@ exports.login = asyncHandler(async (req, res) => {
         phone: owner.phone,
         image: owner?.image,
         role: owner.role,
+        ownerId: owner?.ownerId,
         superAdminId: owner?.superAdminId,
       };
-      
 
       return res.status(200).json({ token, ownerDetails, status: 200 });
     } else {
@@ -103,7 +88,7 @@ exports.login = asyncHandler(async (req, res) => {
   }
 });
 
-// get all superadmin owners 
+// get all superadmin owners
 
 exports.getAllSuperAdminOwner = asyncHandler(async (req, res) => {
   const owner = await ownerModel.find({
@@ -113,8 +98,7 @@ exports.getAllSuperAdminOwner = asyncHandler(async (req, res) => {
   res.status(200).json(owner);
 });
 
-
-// get all owners 
+// get all owners
 exports.getAllOwner = asyncHandler(async (req, res) => {
   const owner = await ownerModel.find({
     role: "owner",
@@ -128,15 +112,13 @@ exports.getAll = asyncHandler(async (req, res) => {
     ownerId: req.params.id,
     role: "staff",
   });
-  
+
   res.status(200).json(owner);
 });
 
 //get by Id
 exports.get = asyncHandler(async (req, res) => {
-  const owner = await ownerModel
-    .findById(req.params.id)
-    .populate("ownerId");
+  const owner = await ownerModel.findById(req.params.id).populate("ownerId");
   res.status(200).json(owner);
 });
 
@@ -148,12 +130,7 @@ exports.delete = asyncHandler(async (req, res) => {
 
 // Update owner (partial update)
 exports.update = asyncHandler(async (req, res) => {
-  const {
-    name,
-    email,
-    phone,
-    role,
-  } = req.body;
+  const { name, email, phone, role } = req.body;
 
   // const image = req.file?.filename;
   const image = req.cloudinaryImageUrl;
@@ -207,7 +184,7 @@ exports.block = async (req, res) => {
     owner.isActive = !owner.isActive;
 
     await owner.save();
-    res.json({owner, status: 200 });
+    res.json({ owner, status: 200 });
   } catch (error) {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });

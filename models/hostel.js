@@ -26,7 +26,6 @@ const hostelSchema = new mongoose.Schema(
     superAdminId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin",
-      required: true,
     },
     ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "Owner" },
     roomsId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
