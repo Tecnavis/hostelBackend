@@ -3,16 +3,16 @@ const asyncHandler = require("express-async-handler");
 
 //create booking
 exports.create = asyncHandler(async (req, res) => {
-  const { userId, roomId,  checkInDate, checkOutDate } =
+  const { userId, roomId, hostelId,  checkInDate, checkOutDate } =
     req.body;
     
     
-  if ( !userId || !roomId ||  !checkInDate || !checkOutDate ) {
+  if ( !userId || !roomId ||  !checkInDate || !checkOutDate || !hostelId ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 
   const booking = await bookingModel.create({
-     userId, roomId,  checkInDate, checkOutDate
+     userId, roomId, hostelId,  checkInDate, checkOutDate
   });
 
   if (booking) {
@@ -26,23 +26,19 @@ exports.create = asyncHandler(async (req, res) => {
 // get all superadmin booking
 
 exports.getAllSuperAdminBookings = asyncHandler(async (req, res) => {
+  const superAdminId = req.params.id;
+
   const bookings = await bookingModel.find()
     .populate({
-      path: 'roomId',
-      populate: {
-        path: 'hostelId',
-        populate: {
-          path: 'superAdminId', 
-        },
-      },
+      path: 'hostelId',
+      match: { superAdminId: superAdminId },
+      model: 'Hostel',
     });
 
-  // Filter bookings where superAdminId matches the request param
-  const filtered = bookings.filter(
-    booking => booking.roomId?.hostelId?.superAdminId?.toString() === req.params.id
-  );
+  // Filter only bookings where hostelId was successfully populated
+  const filteredBookings = bookings.filter(booking => booking.hostelId);
 
-  res.status(200).json(filtered);
+  res.status(200).json(filteredBookings);
 });
 
 
@@ -56,23 +52,19 @@ exports.getAllbooking = asyncHandler(async (req, res) => {
 
 // get all booking under owner
 exports.getAll = asyncHandler(async (req, res) => {
- const bookings = await bookingModel.find()
+ const ownerId = req.params.id;
+
+  const bookings = await bookingModel.find()
     .populate({
-      path: 'roomId',
-      populate: {
-        path: 'hostelId',
-        populate: {
-          path: 'ownerId', 
-        },
-      },
+      path: 'hostelId',
+      match: { ownerId: ownerId },
+      model: 'Hostel',
     });
 
-  // Filter bookings where superAdminId matches the request param
-  const filtered = bookings.filter(
-    booking => booking.roomId?.hostelId?.ownerId?.toString() === req.params.id
-  );
+  // Filter only bookings where hostelId was successfully populated
+  const filteredBookings = bookings.filter(booking => booking.hostelId);
 
-  res.status(200).json(filtered);
+  res.status(200).json(filteredBookings);
 });
 
 //get by Id
