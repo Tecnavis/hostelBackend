@@ -1,4 +1,5 @@
 const adminModel = require("../models/admin");
+const notficationModel = require("../models/notfication");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -105,7 +106,15 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete admin
 exports.delete = asyncHandler(async (req, res) => {
-  await adminModel.findByIdAndDelete(req.params.id);
+ const admin =  await adminModel.findByIdAndDelete(req.params.id);
+
+    const notification = await  notficationModel.create({
+         adminId: admin?._id,
+        message: `Super Admin ${admin?.name} deleted`
+     })
+
+     notification.save();
+
   res.status(200).json({ message: "Admin deleted", status: 200 });
 });
 
@@ -160,6 +169,14 @@ exports.block = async (req, res) => {
 
     await admin.save();
     res.json({ admin, status: 200 });
+     
+    const notification = await  notficationModel.create({
+         adminId: admin?._id,
+        message: `Super Admin ${admin?.name} ${admin.isActive  !== true ? "blocked" : "unblocked"}`
+     })
+
+     notification.save();
+
   } catch (error) {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });

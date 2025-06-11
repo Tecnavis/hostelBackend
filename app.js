@@ -1,4 +1,3 @@
-var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -14,6 +13,8 @@ var hostelRouter = require("./routes/hostel");
 var roomRouter = require("./routes/room");
 var reviewRouter = require("./routes/review");
 var bookingRouter = require("./routes/booking");
+var notficationRouter = require("./routes/notfication");
+
 
 
 
@@ -53,6 +54,8 @@ app.use('/hostels', hostelRouter);
 app.use('/rooms', roomRouter);
 app.use('/reviews', reviewRouter);
 app.use('/bookings', bookingRouter);
+app.use('/notifications', notficationRouter);
+
 
 
 

@@ -1,11 +1,24 @@
 const roomModel = require("../models/room");
 const hostelModel = require("../models/hostel");
+const notficationModel = require("../models/notfication");
 const asyncHandler = require("express-async-handler");
+
 
 //create room
 exports.create = asyncHandler(async (req, res) => {
-  const { roomNumber, capacity, price, currentOccupancy, features, hostelId, roomType, charge, gardianInfo, visitTimes, payment } =
-    req.body;
+  const {
+    roomNumber,
+    capacity,
+    price,
+    currentOccupancy,
+    features,
+    hostelId,
+    roomType,
+    charge,
+    gardianInfo,
+    visitTimes,
+    payment,
+  } = req.body;
 
   if (
     !roomNumber ||
@@ -41,15 +54,22 @@ exports.create = asyncHandler(async (req, res) => {
     hostelId,
     photos: images,
     roomType,
-    charge, 
-    payment, 
-    gardianInfo, 
-    visitTimes
+    charge,
+    payment,
+    gardianInfo,
+    visitTimes,
   });
 
   if (room) {
     hostel.roomsId.push(room._id);
     await hostel.save();
+
+    await notficationModel.create({
+      adminId: hostel?.superAdminId,
+      ownerId: hostel.ownerId,
+      message: `${hostel?.name} new room created.`,
+    });
+
     return res.status(201).json({ message: "room created", status: 201 });
   } else {
     return res.status(400).json({ message: "room not created" });
@@ -81,13 +101,20 @@ exports.delete = asyncHandler(async (req, res) => {
   const hostel = await hostelModel.findById(hostelId);
   if (!hostel) {
     return res.status(404).json({ message: "Hostel not found" });
-  }  
+  }
 
   // Remove the room ID from hostel.roomsId
   hostel.roomsId.pull(id);
   await hostel.save();
 
   await roomModel.findByIdAndDelete(id);
+
+  await notficationModel.create({
+    adminId: hostel?.superAdminId,
+    ownerId: hostel?.ownerId,
+    message: `${hostel?.name} room has been deleted`,
+  });
+
   res.status(200).json({ message: "room deleted", status: 200 });
 });
 
@@ -107,7 +134,7 @@ exports.update = asyncHandler(async (req, res) => {
   // const image = req.file?.filename;
   const image = req.cloudinaryImageUrl;
 
-  const room = await roomModel.findById(req.params.id);
+  const room = await roomModel.findById(req.params.id).populate("hostelId");
 
   if (!room) {
     return res.status(404).json({ message: "room not found" });
@@ -130,6 +157,12 @@ exports.update = asyncHandler(async (req, res) => {
 
   const updatedroom = await room.save();
 
+  await notficationModel.create({
+    adminId: room?.hostelId?.superAdminId,
+    ownerId: room?.hostelId?.ownerId,
+    message: `${room?.hostelId?.name} room updated.`,
+  });
+
   res.status(200).json({
     message: "room updated successfully",
     room: updatedroom,
@@ -141,7 +174,7 @@ exports.update = asyncHandler(async (req, res) => {
 
 exports.block = async (req, res) => {
   try {
-    const room = await roomModel.findById(req.params.id);
+    const room = await roomModel.findById(req.params.id).populate("hostelId");
 
     if (!room) {
       return res.status(404).json({ message: "room not found" });
@@ -150,6 +183,15 @@ exports.block = async (req, res) => {
     room.isActive = !room.isActive;
 
     await room.save();
+
+    await notficationModel.create({
+      adminId: room?.hostelId?.superAdminId,
+      ownerId: room?.hostelId?.ownerId,
+      message: `${room?.hostelId?.name} room ${
+        room.isActive == true ? "blocked" : "unblocked"
+      }`,
+    });
+
     res.json({ room, status: 200 });
   } catch (error) {
     console.error("Error in Block admin:", error);
@@ -157,9 +199,7 @@ exports.block = async (req, res) => {
   }
 };
 
-
-
-// Update rating 
+// Update rating
 
 exports.updateRating = async (req, res) => {
   try {
@@ -167,17 +207,19 @@ exports.updateRating = async (req, res) => {
     const { userId, ratingValue } = req.body;
 
     if (!ratingValue || ratingValue < 1 || ratingValue > 5) {
-      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+      return res
+        .status(400)
+        .json({ message: "Rating must be between 1 and 5" });
     }
 
     const room = await roomModel.findById(id);
     if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
+      return res.status(404).json({ message: "Room not found" });
     }
 
     // Check if user already rated
-    const existingRating = room.rating.details.find((r) =>
-      r.userId.toString() === userId.toString()
+    const existingRating = room.rating.details.find(
+      (r) => r.userId.toString() === userId.toString()
     );
 
     if (existingRating) {
@@ -191,16 +233,18 @@ exports.updateRating = async (req, res) => {
 
     // Recalculate average
     const total = room.rating.details.reduce((sum, r) => sum + r.value, 0);
-    room.rating.average = parseFloat((total / room.rating.details.length).toFixed(2));
+    room.rating.average = parseFloat(
+      (total / room.rating.details.length).toFixed(2)
+    );
 
     await room.save();
 
     res.status(200).json({
-      message: 'Room rating updated successfully',
+      message: "Room rating updated successfully",
       rating: room.rating,
     });
   } catch (error) {
-    console.error('Rating error:', error);
-    res.status(500).json({ message: 'Server error', error });
+    console.error("Rating error:", error);
+    res.status(500).json({ message: "Server error", error });
   }
 };

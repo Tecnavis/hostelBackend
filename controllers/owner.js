@@ -1,4 +1,6 @@
 const ownerModel = require("../models/owner");
+const notficationModel = require("../models/notfication");
+const adminModel = require("../models/admin");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -8,7 +10,7 @@ exports.create = asyncHandler(async (req, res) => {
   const { name, email, password, phone, role, ownerId, superAdminId } =
     req.body;
 
-  if (!name || !phone || !email || !password || !role ) {
+  if (!name || !phone || !email || !password || !role) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 
@@ -35,11 +37,15 @@ exports.create = asyncHandler(async (req, res) => {
     ...(role === "staff" && { ownerId }),
   });
 
-  if (owner) {
-    return res.status(201).json({ message: "Owner created", status: 201 });
-  } else {
-    return res.status(400).json({ message: "Owner not created" });
-  }
+  res.status(201).json({ message: "Owner created", status: 201 });
+
+  const admin = await adminModel.find({ role: "super-admin" });
+  const notification = await notficationModel.create({
+    adminId: admin?._id,
+    message: `New owner created`,
+  });
+
+  notification.save();
 });
 
 exports.login = asyncHandler(async (req, res) => {
@@ -124,7 +130,15 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete owner
 exports.delete = asyncHandler(async (req, res) => {
-  await ownerModel.findByIdAndDelete(req.params.id);
+  const owner =  await ownerModel.findByIdAndDelete(req.params.id);
+
+    const notification = await notficationModel.create({
+    adminId: owner?.superAdminId,
+    ownerId: owner?.ownerId,
+    message: `${owner?.name} has been deleted.`,
+  });
+
+  notification.save();
   res.status(200).json({ message: "Owner deleted", status: 200 });
 });
 
@@ -164,6 +178,14 @@ exports.update = asyncHandler(async (req, res) => {
 
   const updatedowner = await owner.save();
 
+  const notification = await notficationModel.create({
+    adminId: owner?.superAdminId,
+    ownerId: owner?.ownerId,
+    message: `${owner?.name} updated their profile.`,
+  });
+
+  notification.save();
+
   res.status(200).json({
     message: "Owner updated successfully",
     owner: updatedowner,
@@ -185,6 +207,16 @@ exports.block = async (req, res) => {
 
     await owner.save();
     res.json({ owner, status: 200 });
+
+    const notification = await notficationModel.create({
+      adminId: owner?.superAdminId,
+      ownerId: owner?.ownerId,
+      message: `${owner?.name} has been  ${
+        owner.isActive !== true ? "blocked" : "unblocked"
+      }.`,
+    });
+
+    notification.save();
   } catch (error) {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });
