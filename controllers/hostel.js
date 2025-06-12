@@ -1,6 +1,7 @@
 const hostelModel = require("../models/hostel");
 const asyncHandler = require("express-async-handler");
 const notficationModel = require("../models/notfication");
+const adminModel = require("../models/admin");
 
 //create hostel
 exports.create = asyncHandler(async (req, res) => {
@@ -51,21 +52,20 @@ exports.create = asyncHandler(async (req, res) => {
     photos: images,
   });
 
+  if (!hostel) {
+    return res.status(400).json({ message: "Hostel not created" });
+  }
 
-      if (!hostel) {
-        return res.status(400).json({ message: "Hostel not created" });
-      }
-      
-      // Create notification (after successful creation)
-      await notficationModel.create({
-        adminId: hostel?.superAdminId,
-        ownerId: hostel.ownerId,
-        message: `New hostel created: ${hostel?.name}.`,
-      });
-      
-      return res.status(201).json({ message: "hostel created", status: 201 });
+  const admin = await adminModel.findOne({ role: "super-admin" });
 
-  
+  // Create notification (after successful creation)
+  await notficationModel.create({
+    adminId: admin?._id,
+    ownerId: hostel.ownerId,
+    message: `New hostel created: ${hostel?.name}.`,
+  });
+
+  return res.status(201).json({ message: "hostel created", status: 201 });
 });
 
 // get all superadmin hostel
@@ -103,13 +103,15 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete hostel
 exports.delete = asyncHandler(async (req, res) => {
- const hostel =  await hostelModel.findByIdAndDelete(req.params.id);
+  const hostel = await hostelModel.findByIdAndDelete(req.params.id);
 
-      await notficationModel.create({
-      adminId: hostel?.superAdminId,
-      ownerId: hostel.ownerId,
-      message: `${hostel?.name} has been deleted.`,
-    });
+  const admin = await adminModel.findOne({ role: "super-admin" });
+
+  await notficationModel.create({
+    adminId: admin?._id,
+    ownerId: hostel.ownerId,
+    message: `${hostel?.name} has been deleted.`,
+  });
   res.status(200).json({ message: "hostel deleted", status: 200 });
 });
 
@@ -161,8 +163,10 @@ exports.update = asyncHandler(async (req, res) => {
 
   const updatedhostel = await hostel.save();
 
+  const admin = await adminModel.findOne({ role: "super-admin" });
+
   await notficationModel.create({
-    adminId: hostel?.superAdminId,
+    adminId: admin?._id,
     ownerId: hostel.ownerId,
     message: `${hostel.name} has been updated.`,
   });
@@ -188,8 +192,10 @@ exports.block = async (req, res) => {
 
     await hostel.save();
 
+    const admin = await adminModel.findOne({ role: "super-admin" });
+
     await notficationModel.create({
-      adminId: hostel?.superAdminId,
+      adminId: admin?._id,
       ownerId: hostel.ownerId,
       message: `${hostel?.name} ${
         hostel.isActive !== true ? "blocked" : "unblocked"

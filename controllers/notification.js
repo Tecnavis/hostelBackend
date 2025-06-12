@@ -1,29 +1,49 @@
 const notficationModel = require("../models/notfication");
+const asyncHandler = require("express-async-handler");
+
 
 
 
 //get by admin Id not read
 
 exports.getAdminUnread = asyncHandler(async (req, res) => {
-  const notfication = await notficationModel.findById({ adminId :req.params.id,  adminIsRead: false });
-  res.status(200).json(notfication);
+
+  
+  const notifications = await notficationModel.find({
+    adminId: req.params.id,
+    adminIsRead: false,
+  }).sort({ createdAt: -1 });;
+
+  res.status(200).json(notifications);
 });
+
 
 
 //get by notfication Id not read
 
 
 exports.getOwnerUnread = asyncHandler(async (req, res) => {
-  const notfication = await notficationModel.findById({ ownerId :req.params.id,  ownerIsRead: false });
-  res.status(200).json(notfication);
+
+   const notifications = await notficationModel.find({
+     ownerId: req.params.id,
+    ownerIsRead: false,
+  }).sort({ createdAt: -1 });;
+
+  res.status(200).json(notifications);
 });
 
 //get by notfication Id  read
 
 
 exports.getAdminRead = asyncHandler(async (req, res) => {
-  const notfication = await notficationModel.findById({ adminId :req.params.id,  adminIsRead: true });
-  res.status(200).json(notfication);
+
+   const notifications = await notficationModel.find({
+    adminId: req.params.id,
+    adminIsRead: true,
+  }).sort({ createdAt: -1 });;
+
+
+  res.status(200).json(notifications);
 });
 
 
@@ -31,8 +51,14 @@ exports.getAdminRead = asyncHandler(async (req, res) => {
 
 
 exports.getOwnerRead = asyncHandler(async (req, res) => {
-  const notfication = await notficationModel.findById({ ownerId :req.params.id,  ownerIsRead: true });
-  res.status(200).json(notfication);
+
+     const notifications = await notficationModel.find({
+     ownerId: req.params.id,
+    ownerIsRead: true,
+  }).sort({ createdAt: -1 });;
+
+
+  res.status(200).json(notifications);
 });
 
 

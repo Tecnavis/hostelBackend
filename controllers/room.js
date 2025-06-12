@@ -2,7 +2,7 @@ const roomModel = require("../models/room");
 const hostelModel = require("../models/hostel");
 const notficationModel = require("../models/notfication");
 const asyncHandler = require("express-async-handler");
-
+const adminModel = require("../models/admin");
 
 //create room
 exports.create = asyncHandler(async (req, res) => {
@@ -64,8 +64,10 @@ exports.create = asyncHandler(async (req, res) => {
     hostel.roomsId.push(room._id);
     await hostel.save();
 
+    const admin = await adminModel.findOne({ role: "super-admin" });
+
     await notficationModel.create({
-      adminId: hostel?.superAdminId,
+      adminId: admin?._id,
       ownerId: hostel.ownerId,
       message: `${hostel?.name} new room created.`,
     });
@@ -109,8 +111,10 @@ exports.delete = asyncHandler(async (req, res) => {
 
   await roomModel.findByIdAndDelete(id);
 
+  const admin = await adminModel.findOne({ role: "super-admin" });
+
   await notficationModel.create({
-    adminId: hostel?.superAdminId,
+    adminId: admin?._id,
     ownerId: hostel?.ownerId,
     message: `${hostel?.name} room has been deleted`,
   });
@@ -157,8 +161,10 @@ exports.update = asyncHandler(async (req, res) => {
 
   const updatedroom = await room.save();
 
+  const admin = await adminModel.findOne({ role: "super-admin" });
+
   await notficationModel.create({
-    adminId: room?.hostelId?.superAdminId,
+    adminId: admin?._id,
     ownerId: room?.hostelId?.ownerId,
     message: `${room?.hostelId?.name} room updated.`,
   });
@@ -183,12 +189,13 @@ exports.block = async (req, res) => {
     room.isActive = !room.isActive;
 
     await room.save();
+    const admin = await adminModel.findOne({ role: "super-admin" });
 
     await notficationModel.create({
-      adminId: room?.hostelId?.superAdminId,
+      adminId: admin?._id,
       ownerId: room?.hostelId?.ownerId,
       message: `${room?.hostelId?.name} room ${
-        room.isActive == true ? "blocked" : "unblocked"
+        room.isActive !== true ? "blocked" : "unblocked"
       }`,
     });
 

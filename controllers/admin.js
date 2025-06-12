@@ -33,13 +33,22 @@ exports.create = asyncHandler(async (req, res) => {
     phone,
     ...(role === "admin" && { superAdminId }),
   });
-  adminModel;
+  
 
-  if (admin) {
-    return res.status(201).json({ message: "Admin created", status: 201 });
-  } else {
+
+  if (!admin) {
     return res.status(400).json({ message: "Admin not created" });
   }
+
+    const notification = await notficationModel.create({
+      adminId: admin?.superAdminId,
+      message: `New admin created`,
+    });
+  
+    notification.save();
+
+
+  return res.status(201).json({ message: "Admin created", status: 201 });
 });
 
 exports.login = asyncHandler(async (req, res) => {
@@ -109,7 +118,7 @@ exports.delete = asyncHandler(async (req, res) => {
  const admin =  await adminModel.findByIdAndDelete(req.params.id);
 
     const notification = await  notficationModel.create({
-         adminId: admin?._id,
+         adminId: admin?.superAdminId,
         message: `Super Admin ${admin?.name} deleted`
      })
 
@@ -171,7 +180,7 @@ exports.block = async (req, res) => {
     res.json({ admin, status: 200 });
      
     const notification = await  notficationModel.create({
-         adminId: admin?._id,
+         adminId: admin?.superAdminId,
         message: `Super Admin ${admin?.name} ${admin.isActive  !== true ? "blocked" : "unblocked"}`
      })
 

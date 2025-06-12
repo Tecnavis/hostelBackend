@@ -37,15 +37,21 @@ exports.create = asyncHandler(async (req, res) => {
     ...(role === "staff" && { ownerId }),
   });
 
+  await owner.save();
+
   res.status(201).json({ message: "Owner created", status: 201 });
 
-  const admin = await adminModel.find({ role: "super-admin" });
+  const admin = await adminModel.findOne({ role: "super-admin" });
+
+  
   const notification = await notficationModel.create({
+    ownerId,
     adminId: admin?._id,
     message: `New owner created`,
   });
 
   notification.save();
+
 });
 
 exports.login = asyncHandler(async (req, res) => {
