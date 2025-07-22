@@ -8,7 +8,7 @@ router.post('/', uploadImageArray, Controller.create);
 router.get('/hostels/:id', Controller.getAll);
 router.get("/", Controller.getAllroom);
 router.get('/:id', Controller.get);
-router.put('/:id', uploadImageSingle, Controller.update);
+router.put('/:id', uploadImageArray, Controller.update);
 router.delete('/:id/hostels/:hostelId', Controller.delete);
 router.patch("/block/:id", Controller.block);
 router.put("/ratings/:id", Controller.updateRating);

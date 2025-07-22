@@ -9,7 +9,7 @@ router.get("/", Controller.getAllhostel);
 router.get('/owner/:id', Controller.getAll);
 router.get('/super-admin/:id', Controller.getAllSuperAdminOwner);
 router.get('/:id', Controller.get);
-router.put('/:id', uploadImageSingle, Controller.update);
+router.put("/:id", uploadImageArray, Controller.update);
 router.delete('/:id', Controller.delete);
 router.patch("/block/:id", Controller.block);
 router.put("/ratings/:id", Controller.updateRating);

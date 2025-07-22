@@ -129,52 +129,46 @@ exports.update = asyncHandler(async (req, res) => {
     capacity,
     price,
     currentOccupancy,
+    roomType,
+    payment,
+    charge,
     features,
-    hostelId,
-    isOccupied,
-    index,
+    visitTimes,
+    gardianInfo,
   } = req.body;
 
-  // const image = req.file?.filename;
-  const image = req.cloudinaryImageUrl;
-
-  const room = await roomModel.findById(req.params.id).populate("hostelId");
-
+  const room = await roomModel.findById(req.params.id);
   if (!room) {
-    return res.status(404).json({ message: "room not found" });
+    return res.status(404).json({ message: "Room not found" });
   }
 
-  const imageIndex = parseInt(index);
-  if (isNaN(imageIndex) || imageIndex < 0 || imageIndex >= room.photos.length) {
-    return res.status(400).json({ message: "Invalid image index" });
+  room.roomNumber = roomNumber;
+  room.capacity = capacity;
+  room.price = price;
+  room.currentOccupancy = currentOccupancy;
+  room.roomType = roomType;
+  room.payment = payment;
+  room.charge = charge;
+  room.features = features;
+  room.visitTimes = visitTimes;
+  room.gardianInfo = gardianInfo;
+
+  // ✅ Combine existing & new photos
+  let existing = [];
+  if (req.body.existingImages) {
+    existing = JSON.parse(req.body.existingImages);
   }
 
-  // Update only the fields provided
-  if (roomNumber) room.roomNumber = roomNumber;
-  if (capacity) room.capacity = capacity;
-  if (price) room.price = price;
-  if (currentOccupancy) room.currentOccupancy = currentOccupancy;
-  if (features) room.features = features;
-  if (hostelId) room.hostelId = hostelId;
-  if (isOccupied) room.isOccupied = isOccupied;
-  if (image) room.photos[imageIndex] = image;
+  const newPhotos = req.cloudinaryImageUrl || [];
 
-  const updatedroom = await room.save();
+  room.photos = [...existing, ...newPhotos];
 
-  const admin = await adminModel.findOne({ role: "super-admin" });
+  await room.save();
 
-  await notficationModel.create({
-    adminId: admin?._id,
-    ownerId: room?.hostelId?.ownerId,
-    message: `${room?.hostelId?.name} room updated.`,
-  });
-
-  res.status(200).json({
-    message: "room updated successfully",
-    room: updatedroom,
-    status: 200,
-  });
+  res.status(200).json({ status: 200, message: "Room updated", room });
 });
+
+
 
 // block and unblock room
 

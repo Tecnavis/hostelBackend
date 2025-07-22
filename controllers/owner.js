@@ -152,8 +152,6 @@ exports.delete = asyncHandler(async (req, res) => {
 exports.update = asyncHandler(async (req, res) => {
   const { name, email, phone, role } = req.body;
 
-  // const image = req.file?.filename;
-  const image = req.cloudinaryImageUrl;
 
   const owner = await ownerModel.findById(req.params.id);
 
@@ -171,10 +169,9 @@ exports.update = asyncHandler(async (req, res) => {
 
   // Update only the fields provided
   if (name) owner.name = name;
-  if (phone) owner.phone = hostelPhone;
+  if (phone) owner.phone = phone;
   if (email) owner.email = email;
   if (role) owner.role = role;
-  if (image) owner.image = image;
   // if(gst) owner.gst = gst;
   // if (location) {
   //   if (location.street) owner.location.street = location.street;

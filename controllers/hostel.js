@@ -116,55 +116,77 @@ exports.delete = asyncHandler(async (req, res) => {
 });
 
 // Update hostel (partial update)
+
+
 exports.update = asyncHandler(async (req, res) => {
   const {
     name,
     phone,
+    price,
+    accommodationType,
     location,
     description,
     amenities,
     category,
     ownerId,
-    gst,
-    index,
+    existingPhotos,
   } = req.body;
 
-  // const image = req.file?.filename;
-  const image = req.cloudinaryImageUrl;
+
+  const newImages = req.cloudinaryImageUrl || [];
 
   const hostel = await hostelModel.findById(req.params.id);
-
   if (!hostel) {
-    return res.status(404).json({ message: "hostel not found" });
+    return res.status(404).json({ message: "Hostel not found" });
   }
 
-  const imageIndex = parseInt(index);
-  if (
-    isNaN(imageIndex) ||
-    imageIndex < 0 ||
-    imageIndex >= hostel.photos.length
-  ) {
-    return res.status(400).json({ message: "Invalid image index" });
-  }
-
-  // Update only the fields provided
+  // ✅ Update fields if provided
   if (name) hostel.name = name;
   if (phone) hostel.phone = phone;
-  if (gst) hostel.gst = gst;
+  if (price) hostel.price = price;
+  if (accommodationType) hostel.accommodationType = accommodationType;
   if (description) hostel.description = description;
   if (category) hostel.category = category;
   if (ownerId) hostel.ownerId = ownerId;
+
   if (location) {
     if (location.street) hostel.location.street = location.street;
     if (location.place) hostel.location.place = location.place;
     if (location.pincode) hostel.location.pincode = location.pincode;
   }
-  if (image) hostel.photos[imageIndex] = image;
 
-  const updatedhostel = await hostel.save();
+  // ✅ ✅ ✅ Update amenities properly:
+  if (amenities) {
+    if (Array.isArray(amenities)) {
+      hostel.amenities = amenities;
+    } else {
+      // If client sends as string from FormData, split it
+      try {
+        const parsed = JSON.parse(amenities);
+        if (Array.isArray(parsed)) {
+          hostel.amenities = parsed;
+        } else {
+          hostel.amenities = [parsed];
+        }
+      } catch {
+        hostel.amenities = [amenities];
+      }
+    }
+  }
+
+  // ✅ Merge photos
+  let finalPhotos = [];
+  if (existingPhotos) {
+    finalPhotos = JSON.parse(existingPhotos);
+  }
+  if (newImages && newImages.length > 0) {
+    finalPhotos = finalPhotos.concat(newImages);
+  }
+  hostel.photos = finalPhotos;
+
+  const updatedHostel = await hostel.save();
 
   const admin = await adminModel.findOne({ role: "super-admin" });
-
   await notficationModel.create({
     adminId: admin?._id,
     ownerId: hostel.ownerId,
@@ -172,8 +194,8 @@ exports.update = asyncHandler(async (req, res) => {
   });
 
   res.status(200).json({
-    message: "hostel updated successfully",
-    hostel: updatedhostel,
+    message: "Hostel updated successfully",
+    hostel: updatedHostel,
     status: 200,
   });
 });

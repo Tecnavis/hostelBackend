@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 
 //create admin
 exports.create = asyncHandler(async (req, res) => {
+  
   const { name, email, password, phone, role, superAdminId } = req.body;
 
   if (!name || !email || !password || !phone || !role) {
@@ -129,12 +130,14 @@ exports.delete = asyncHandler(async (req, res) => {
 
 // Update admin (partial update)
 exports.update = asyncHandler(async (req, res) => {
+  
   const { name, email, phone, role } = req.body;
 
   // const image = req.file?.filename;
-  const image = req.cloudinaryImageUrl;
 
   const admin = await adminModel.findById(req.params.id);
+
+  
 
   if (!admin) {
     return res.status(404).json({ message: "Admin not found" });
@@ -153,7 +156,6 @@ exports.update = asyncHandler(async (req, res) => {
   if (email) admin.email = email;
   if (phone) admin.phone = phone;
   if (role) admin.role = role;
-  if (image) admin.image = image;
 
   const updatedadmin = await admin.save();
 
