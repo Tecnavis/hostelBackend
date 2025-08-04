@@ -17,6 +17,7 @@ exports.create = asyncHandler(async (req, res) => {
     price,
     superAdminId,
   } = req.body;
+  
 
   if (
     !name ||

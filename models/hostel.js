@@ -17,7 +17,13 @@ const hostelSchema = new mongoose.Schema(
     photos: [String],
     accommodationType: { type: String, required: true },
     description: { type: String, required: true },
-    amenities: [String], // e.g., ['WiFi', 'Laundry', 'Parking']
+    amenities: [
+  {
+    name: { type: String, required: true },
+    icon: { type: String, required: true },
+  }
+],
+ // e.g., ['WiFi', 'Laundry', 'Parking']
     category: {
       type: String,
       required: true,

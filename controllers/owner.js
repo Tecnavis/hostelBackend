@@ -152,7 +152,6 @@ exports.delete = asyncHandler(async (req, res) => {
 exports.update = asyncHandler(async (req, res) => {
   const { name, email, phone, role } = req.body;
 
-
   const owner = await ownerModel.findById(req.params.id);
 
   if (!owner) {
