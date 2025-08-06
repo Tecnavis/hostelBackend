@@ -18,12 +18,34 @@ const hostelSchema = new mongoose.Schema(
     accommodationType: { type: String, required: true },
     description: { type: String, required: true },
     amenities: [
-  {
-    name: { type: String, required: true },
-    icon: { type: String, required: true },
-  }
-],
- // e.g., ['WiFi', 'Laundry', 'Parking']
+      {
+        name: { type: String, required: true },
+        icon: { type: String, required: true },
+      },
+    ],
+    transportation: [
+      {
+        name: { type: String, required: true },
+        icon: { type: String, required: true },
+        far: { type: String, required: true },
+      },
+    ],
+    restaurants: [
+      {
+        name: { type: String, required: true },
+        icon: { type: String, required: true },
+        far: { type: String, required: true },
+      },
+    ],
+    nearbyPlaces: [
+      {
+        name: { type: String, required: true },
+        icon: { type: String, required: true },
+        far: { type: String, required: true },
+      },
+    ],
+
+    // e.g., ['WiFi', 'Laundry', 'Parking']
     category: {
       type: String,
       required: true,
@@ -68,4 +90,3 @@ const hostelSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Hostel", hostelSchema);
-

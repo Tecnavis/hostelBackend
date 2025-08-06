@@ -11,13 +11,15 @@ exports.create = asyncHandler(async (req, res) => {
     location,
     description,
     amenities,
+    transportation,
+    restaurants,
+    nearbyPlaces,
     category,
     ownerId,
     accommodationType,
     price,
     superAdminId,
   } = req.body;
-  
 
   if (
     !name ||
@@ -28,7 +30,10 @@ exports.create = asyncHandler(async (req, res) => {
     !category ||
     !ownerId ||
     !accommodationType ||
-    !price
+    !price ||
+    !transportation ||
+    !restaurants ||
+    !nearbyPlaces
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -45,11 +50,14 @@ exports.create = asyncHandler(async (req, res) => {
     location,
     description,
     amenities,
+    transportation,
+    restaurants,
     category,
     ownerId,
     accommodationType,
     price,
     superAdminId,
+    nearbyPlaces,
     photos: images,
   });
 
@@ -118,7 +126,6 @@ exports.delete = asyncHandler(async (req, res) => {
 
 // Update hostel (partial update)
 
-
 exports.update = asyncHandler(async (req, res) => {
   const {
     name,
@@ -132,7 +139,6 @@ exports.update = asyncHandler(async (req, res) => {
     ownerId,
     existingPhotos,
   } = req.body;
-
 
   const newImages = req.cloudinaryImageUrl || [];
 

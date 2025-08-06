@@ -14,6 +14,8 @@ var roomRouter = require("./routes/room");
 var reviewRouter = require("./routes/review");
 var bookingRouter = require("./routes/booking");
 var notficationRouter = require("./routes/notfication");
+var blogRouter = require("./routes/blog");
+
 
 
 
@@ -55,6 +57,7 @@ app.use('/rooms', roomRouter);
 app.use('/reviews', reviewRouter);
 app.use('/bookings', bookingRouter);
 app.use('/notifications', notficationRouter);
+app.use("/blogs", blogRouter);
 
 
 
