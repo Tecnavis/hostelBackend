@@ -1,20 +1,44 @@
-const Blog = require("../models/blog"); 
+const Blog = require("../models/blog");
+const adminModel = require("../models/admin");
+const notficationModel = require("../models/notfication");
 
 // Create a new blog post
 const createBlog = async (req, res) => {
   try {
-    const { ownerId, title, photos, date, description } = req.body;
+    const { ownerId, title, date, description, sections } = req.body;
+
+
+    if (!ownerId || !title || !description || !date || !sections) {
+      return res.status(400).json({ message: "Please add all fields" });
+    }
+
+    let parsedSections = sections;
+
+    if (typeof sections === "string") {
+      try {
+        parsedSections = JSON.parse(sections);
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid format for sections" });
+      }
+    }
+
+    const images = req.cloudinaryImageUrl;
+
+    if (!images.length) {
+      return res.status(400).json({ message: "No images uploaded" });
+    }
 
     const newBlog = new Blog({
       ownerId,
       title,
-      photos,
       date,
       description,
+      photos: images,
+      sections: parsedSections,
     });
 
     const savedBlog = await newBlog.save();
-    res.status(201).json(savedBlog);
+    res.status(201).json({ savedBlog, status: 201 });
   } catch (error) {
     res.status(500).json({ error: "Failed to create blog post" });
   }
@@ -43,18 +67,37 @@ const getBlogById = async (req, res) => {
 };
 
 // Update a blog post
+
 const updateBlog = async (req, res) => {
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true }
-    );
+    const blogId = req.params.id;
+    const newImages = req.cloudinaryImageUrl || [];
 
-    if (!updatedBlog) return res.status(404).json({ error: "Blog post not found" });
+    // Find the existing blog first
+    const existingBlog = await Blog.findById(blogId);
+    if (!existingBlog) {
+      return res.status(404).json({ error: "Blog post not found" });
+    }
+
+    // Merge existing photos with new images
+    let finalPhotos = existingBlog.photos || [];
+    if (newImages.length > 0) {
+      finalPhotos = finalPhotos.concat(newImages);
+    }
+
+    // Update the blog fields
+    const updatedData = {
+      ...req.body,
+      photos: finalPhotos,
+    };
+
+    const updatedBlog = await Blog.findByIdAndUpdate(blogId, updatedData, {
+      new: true,
+    });
 
     res.status(200).json(updatedBlog);
   } catch (error) {
+    console.error("Update Error:", error);
     res.status(500).json({ error: "Failed to update blog post" });
   }
 };
@@ -64,14 +107,16 @@ const deleteBlog = async (req, res) => {
   try {
     const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
 
-    if (!deletedBlog) return res.status(404).json({ error: "Blog post not found" });
+    if (!deletedBlog)
+      return res.status(404).json({ error: "Blog post not found" });
 
-    res.status(200).json({ message: "Blog post deleted successfully" });
+    res
+      .status(200)
+      .json({ message: "Blog post deleted successfully", status: 200 });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete blog post" });
   }
 };
-
 
 // block and unblock room
 
@@ -92,7 +137,7 @@ const blockBlog = async (req, res) => {
       adminId: admin?._id,
       ownerId: blog?.ownerId,
       message: `${blog?.name} blog ${
-        room.isActive !== true ? "blocked" : "unblocked"
+        blog.isActive !== true ? "blocked" : "unblocked"
       }`,
     });
 
@@ -109,5 +154,5 @@ module.exports = {
   getBlogById,
   updateBlog,
   deleteBlog,
-  blockBlog 
+  blockBlog,
 };
