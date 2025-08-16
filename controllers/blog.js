@@ -71,7 +71,18 @@ const getBlogById = async (req, res) => {
 const updateBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
-    const newImages = req.cloudinaryImageUrl || [];
+    const newImages = req.cloudinaryImageUrl || [];    
+
+    let { sections, ...rest } = req.body;
+
+    // 🔑 Fix: Parse sections if it's a string
+    if (typeof sections === "string") {
+      try {
+        sections = JSON.parse(sections);
+      } catch (e) {
+        return res.status(400).json({ error: "Invalid JSON in sections" });
+      }
+    }
 
     // Find the existing blog first
     const existingBlog = await Blog.findById(blogId);
@@ -85,17 +96,19 @@ const updateBlog = async (req, res) => {
       finalPhotos = finalPhotos.concat(newImages);
     }
 
-    // Update the blog fields
+    // Prepare update object
     const updatedData = {
-      ...req.body,
+      ...rest,
+      sections,     
       photos: finalPhotos,
     };
 
     const updatedBlog = await Blog.findByIdAndUpdate(blogId, updatedData, {
       new: true,
+      runValidators: true, 
     });
 
-    res.status(200).json(updatedBlog);
+    res.status(200).json({ updatedBlog, status: 200 });
   } catch (error) {
     console.error("Update Error:", error);
     res.status(500).json({ error: "Failed to update blog post" });
