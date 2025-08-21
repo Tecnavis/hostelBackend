@@ -19,6 +19,7 @@ exports.create = asyncHandler(async (req, res) => {
     accommodationType,
     price,
     superAdminId,
+    googleMap,
   } = req.body;
   
 
@@ -34,7 +35,8 @@ exports.create = asyncHandler(async (req, res) => {
     !price ||
     !transportation ||
     !restaurants ||
-    !nearbyPlaces
+    !nearbyPlaces ||
+    !googleMap
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -60,6 +62,7 @@ exports.create = asyncHandler(async (req, res) => {
     superAdminId,
     nearbyPlaces,
     photos: images,
+    googleMap,
   });
 
   if (!hostel) {
@@ -102,6 +105,14 @@ exports.getAll = asyncHandler(async (req, res) => {
     .populate("ownerId");
   res.status(200).json(hostel);
 });
+
+exports.getAllActive = asyncHandler(async (req, res) => {
+  const hostel = await hostelModel
+    .find({ isActive: false })
+    .populate("ownerId");
+  res.status(200).json(hostel);
+});
+
 
 //get by Id
 exports.get = asyncHandler(async (req, res) => {
@@ -223,6 +234,7 @@ exports.update = asyncHandler(async (req, res) => {
     category,
     ownerId,
     existingPhotos,
+    googleMap,
   } = req.body;
 
   const newImages = req.cloudinaryImageUrl || [];
@@ -232,6 +244,8 @@ exports.update = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Hostel not found" });
   }
 
+  
+
   // Basic fields
   if (name) hostel.name = name;
   if (phone) hostel.phone = phone;
@@ -240,6 +254,7 @@ exports.update = asyncHandler(async (req, res) => {
   if (description) hostel.description = description;
   if (category) hostel.category = category;
   if (ownerId) hostel.ownerId = ownerId;
+  if (googleMap) hostel.googleMap = googleMap;
 
   if (location) {
     if (location.street) hostel.location.street = location.street;

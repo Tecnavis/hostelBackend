@@ -85,6 +85,10 @@ const hostelSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    googleMap: {
+      type:  String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

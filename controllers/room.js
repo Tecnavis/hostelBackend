@@ -96,6 +96,15 @@ exports.get = asyncHandler(async (req, res) => {
   res.status(200).json(room);
 });
 
+
+exports.getAllActive = asyncHandler(async (req, res) => {
+  const room = await roomModel
+    .find({ isActive: false })
+    .populate("hostelId");
+  res.status(200).json(room);
+});
+
+
 //delete room
 exports.delete = asyncHandler(async (req, res) => {
   const { id, hostelId } = req.params;

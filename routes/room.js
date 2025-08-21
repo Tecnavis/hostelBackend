@@ -7,6 +7,7 @@ const { uploadImageSingle, uploadImageArray } = require('../lib/multer');
 router.post('/', uploadImageArray, Controller.create); 
 router.get('/hostels/:id', Controller.getAll);
 router.get("/", Controller.getAllroom);
+// router.get("/active", Controller.getAllActive);
 router.get('/:id', Controller.get);
 router.put('/:id', uploadImageArray, Controller.update);
 router.delete('/:id/hostels/:hostelId', Controller.delete);

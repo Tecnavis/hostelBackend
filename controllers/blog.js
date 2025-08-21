@@ -1,9 +1,11 @@
 const Blog = require("../models/blog");
 const adminModel = require("../models/admin");
 const notficationModel = require("../models/notfication");
+const asyncHandler = require("express-async-handler");
+
 
 // Create a new blog post
-const createBlog = async (req, res) => {
+const createBlog = asyncHandler( async (req, res) => {
   try {
     const { ownerId, title, date, description, sections } = req.body;
 
@@ -42,20 +44,31 @@ const createBlog = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Failed to create blog post" });
   }
-};
+});
+
+const getAllActive = asyncHandler(async (req, res) => {
+
+    try {
+    const blogs = await Blog.find({ isActive: false }).populate("ownerId");
+    res.status(200).json(blogs);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch blog posts" });
+  }
+});
+
 
 // Get all blog posts
-const getAllBlogs = async (req, res) => {
+const getAllBlogs =  asyncHandler( async (req, res) => {
   try {
     const blogs = await Blog.find().populate("ownerId");
     res.status(200).json(blogs);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch blog posts" });
   }
-};
+});
 
 // Get a single blog post by ID
-const getBlogById = async (req, res) => {
+const getBlogById = asyncHandler( async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id).populate("ownerId");
     if (!blog) return res.status(404).json({ error: "Blog post not found" });
@@ -64,11 +77,11 @@ const getBlogById = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch blog post" });
   }
-};
+});
 
 // Update a blog post
 
-const updateBlog = async (req, res) => {
+const updateBlog =  asyncHandler( async (req, res) => {
   try {
     const blogId = req.params.id;
     const newImages = req.cloudinaryImageUrl || [];    
@@ -113,10 +126,10 @@ const updateBlog = async (req, res) => {
     console.error("Update Error:", error);
     res.status(500).json({ error: "Failed to update blog post" });
   }
-};
+});
 
 // Delete a blog post
-const deleteBlog = async (req, res) => {
+const deleteBlog =  asyncHandler ( async (req, res) => {
   try {
     const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
 
@@ -129,11 +142,11 @@ const deleteBlog = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Failed to delete blog post" });
   }
-};
+});
 
 // block and unblock room
 
-const blockBlog = async (req, res) => {
+const blockBlog = asyncHandler ( async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id).populate("ownerId");
 
@@ -159,7 +172,7 @@ const blockBlog = async (req, res) => {
     console.error("Error in Block admin:", error);
     res.status(500).json({ message: "Server Error" });
   }
-};
+});
 
 module.exports = {
   createBlog,
@@ -168,4 +181,5 @@ module.exports = {
   updateBlog,
   deleteBlog,
   blockBlog,
+  getAllActive
 };
