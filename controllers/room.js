@@ -11,7 +11,6 @@ exports.create = asyncHandler(async (req, res) => {
     capacity,
     price,
     currentOccupancy,
-    features,
     hostelId,
     roomType,
     charge,
@@ -25,7 +24,6 @@ exports.create = asyncHandler(async (req, res) => {
     !capacity ||
     !price ||
     !currentOccupancy ||
-    !features ||
     !hostelId ||
     !roomType ||
     !charge ||
@@ -50,7 +48,6 @@ exports.create = asyncHandler(async (req, res) => {
     capacity,
     price,
     currentOccupancy,
-    features,
     hostelId,
     photos: images,
     roomType,
@@ -141,7 +138,6 @@ exports.update = asyncHandler(async (req, res) => {
     roomType,
     payment,
     charge,
-    features,
     visitTimes,
     gardianInfo,
   } = req.body;
@@ -158,7 +154,6 @@ exports.update = asyncHandler(async (req, res) => {
   room.roomType = roomType;
   room.payment = payment;
   room.charge = charge;
-  room.features = features;
   room.visitTimes = visitTimes;
   room.gardianInfo = gardianInfo;
 

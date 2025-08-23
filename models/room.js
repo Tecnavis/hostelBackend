@@ -10,7 +10,6 @@ const roomSchema = new mongoose.Schema(
     charge: { type: String },
     payment: { type: String, required: true },
     currentOccupancy: { type: Number, default: 0 }, // how many people are currently in the room (e.g., shared rooms or dorms).
-    features: [String], // e.g., ['AC', 'Attached Bathroom']
     isOccupied: { type: Boolean, default: false },
     photos: [String],
     gardianInfo: {

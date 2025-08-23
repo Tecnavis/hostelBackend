@@ -2,6 +2,8 @@ const hostelModel = require("../models/hostel");
 const asyncHandler = require("express-async-handler");
 const notficationModel = require("../models/notfication");
 const adminModel = require("../models/admin");
+const roomModel = require("../models/room");
+
 
 //create hostel
 exports.create = asyncHandler(async (req, res) => {
@@ -124,7 +126,12 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete hostel
 exports.delete = asyncHandler(async (req, res) => {
+
+  
   const hostel = await hostelModel.findByIdAndDelete(req.params.id);
+  
+   await roomModel.findByIdAndDelete({ hostelId : req.params.id });
+  
 
   const admin = await adminModel.findOne({ role: "super-admin" });
 
