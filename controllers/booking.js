@@ -5,9 +5,9 @@ const hostelModel = require("../models/hostel");
 
 //create booking
 exports.create = asyncHandler(async (req, res) => {
-  const { userId, roomId, hostelId, checkInDate, checkOutDate } = req.body;
+  const { userId, roomId, hostelId, checkInDate } = req.body.data;
 
-  if (!userId || !roomId || !checkInDate || !checkOutDate || !hostelId) {
+  if (!userId || !roomId || !checkInDate || !hostelId) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 
@@ -16,7 +16,7 @@ exports.create = asyncHandler(async (req, res) => {
     roomId,
     hostelId,
     checkInDate,
-    checkOutDate,
+    // checkOutDate,
   });
 
   if (!booking) {
@@ -96,6 +96,17 @@ exports.getAll = asyncHandler(async (req, res) => {
   res.status(200).json(filteredBookings);
 });
 
+
+// get all booking under owner
+exports.getAllUserBooking = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+
+  const bookings = await bookingModel
+    .find({userId: userId}).populate("hostelId");
+
+  res.status(200).json(bookings);
+});
+
 //get by Id
 exports.get = asyncHandler(async (req, res) => {
   const booking = await bookingModel
@@ -122,7 +133,7 @@ exports.delete = asyncHandler(async (req, res) => {
 
 // Update booking (partial update)
 exports.update = asyncHandler(async (req, res) => {
-  const { checkInDate, checkOutDate, status, paymentStatus } = req.body;
+  const { checkInDate, status, paymentStatus } = req.body;
 
   const booking = await bookingModel.findById(req.params.id);
 
@@ -131,7 +142,7 @@ exports.update = asyncHandler(async (req, res) => {
   }
 
   if (checkInDate) booking.checkInDate = checkInDate;
-  if (checkOutDate) booking.checkOutDate = checkOutDate;
+  // if (checkOutDate) booking.checkOutDate = checkOutDate;
   if (status) booking.status = status;
   if (paymentStatus) booking.paymentStatus = paymentStatus;
 

@@ -6,6 +6,7 @@ const Controller = require('../controllers/booking');
 router.post('/',  Controller.create); 
 router.get("/", Controller.getAllbooking);
 router.get('/owner/:id', Controller.getAll);
+router.get('/user/:id', Controller.getAllUserBooking);
 router.get('/super-admin/:id', Controller.getAllSuperAdminBookings);
 router.get('/:id', Controller.get);
 router.put('/:id',  Controller.update);

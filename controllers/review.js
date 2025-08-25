@@ -3,7 +3,8 @@ const asyncHandler = require("express-async-handler");
 
 // Create a new review
 exports.createreview = asyncHandler(async (req, res) => {
-  const { chat, userId, roomId } = req.body;
+  const { chat, userId, roomId } = req.body.data;
+  
 
   if ( !chat || !userId || !roomId) {
     return res.status(400).json({ error: "All fields are required" });
@@ -32,7 +33,7 @@ exports.getreviews = asyncHandler(async (req, res) => {
 exports.geRoomReview = asyncHandler(async (req, res) => {
     const { id } = req.params;
   
-    const discussions = await Review.find({ documentId: id})
+    const discussions = await Review.find({ roomId: id})
       .populate("userId", "name image")
       .populate("roomId");
     res.status(200).json(discussions);

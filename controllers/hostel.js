@@ -110,7 +110,7 @@ exports.getAll = asyncHandler(async (req, res) => {
 
 exports.getAllActive = asyncHandler(async (req, res) => {
   const hostel = await hostelModel
-    .find({ isActive: false })
+    .find({ isActive: true })
     .populate("ownerId");
   res.status(200).json(hostel);
 });
