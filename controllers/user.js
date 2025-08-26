@@ -2,10 +2,20 @@ const UserModel = require("../models/user");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const otpStorage = new Map();
+const twilio = require("twilio");
+require("dotenv").config();
+
+
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN );
+
+
+
+
 
 //create user
 exports.create = asyncHandler(async (req, res) => {
-  const { name, email, password,  phone } = req.body;
+  const { name, email, password,  phone } = req.body.data;
 
   if (!name || !email || !password ||!phone) {
     return res.status(400).json({ message: "Please add all fields" });
@@ -38,28 +48,80 @@ exports.create = asyncHandler(async (req, res) => {
   }
 });
 
-exports.login = asyncHandler(async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    const user = await UserModel.findOne({
-      email: email,
+
+exports.login = asyncHandler(async (req, res) => {
+  let { phone } = req.body.data;
+
+  
+  // Check if customer exists
+  const user = await UserModel.findOne({ phone });
+  
+  
+  if (!user) {
+    return res.status(400).json({ message: "Phone number not registered" });
+  }
+  // Ensure +91 prefix with space
+  if (!phone.startsWith("+91")) {
+    phone = "+91 " + phone.replace(/^\+91\s*/, "").trim();
+  }
+  
+
+  // Generate OTP (6-digit random number)
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  otpStorage.set(phone, otp); // Store OTP temporarily
+
+  // Send OTP via Twilio
+  try {
+    await client.messages.create({
+      body: `Your verification code is: ${otp}`,
+      from: process.env.TWLIO_NUMBER,
+      to: phone,
     });
 
-    if (!user) {
-      return res
-        .status(400)
-        .json({ invalid: true, message: "Invalid email or password" });
+  
+    res.status(200).json({ message: "OTP sent successfully" , status: 200});
+  } catch (error) {
+    console.error("Twilio Error:", error);
+    res.status(500).json({ message: "Failed to send OTP" });
+  }
+});
+
+
+exports.verifyOtp = asyncHandler(async (req, res) => {
+  try {
+    const { phone, otp } = req.body.data;    
+
+    if (!phone || !otp) {
+      return res.status(400).json({ message: "Phone and OTP are required" });
     }
 
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    // Ensure +91 prefix
+    const formattedPhone = phone.startsWith("+91")
+      ? phone
+      : "+91 " + phone.replace(/^\+91\s*/, "").trim();
 
-    if (isPasswordMatch) {
-      const token = jwt.sign(
+    // Validate OTP
+    const storedOtp = otpStorage.get(formattedPhone);
+    if (!storedOtp || storedOtp != otp) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    // Remove OTP from storage
+    otpStorage.delete(formattedPhone);
+
+    // Find customer
+    const user = await UserModel.findOne({ phone: phone });
+    if (!user) {
+      return res.status(400).json({ message: "Customer not found" });
+    }
+  
+          const token = jwt.sign(
         { email: user.email, id: user._id },
         "myjwtsecretkey",
         { expiresIn: "1h" }
       );
+
 
       const userDetails = {
         name: user.name,
@@ -69,14 +131,11 @@ exports.login = asyncHandler(async (req, res) => {
         image: user?.image,
       };
 
-      return res.status(200).json({ token, userDetails, status: 200 });
-    } else {
-      return res
-        .status(400)
-        .json({ invalid: true, message: "Invalid email or password" });
-    }
+      return res.status(200).json({  message: "OTP verified successfully", token, userDetails, status: 200 });
+
+
   } catch (err) {
-    console.error(err);
+    console.error("Verify OTP error:", err);
     return res.status(500).json({ error: "Server error, please try again" });
   }
 });
