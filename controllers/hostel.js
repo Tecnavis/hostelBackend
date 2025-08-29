@@ -350,7 +350,8 @@ exports.block = async (req, res) => {
 exports.updateRating = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, ratingValue } = req.body;
+    
+    const { userId, ratingValue } = req.body.data;
 
     if (!ratingValue || ratingValue < 1 || ratingValue > 5) {
       return res
@@ -360,7 +361,7 @@ exports.updateRating = async (req, res) => {
 
     const hostel = await hostelModel.findById(id);
     if (!hostel) {
-      return res.status(404).json({ message: "Room not found" });
+      return res.status(404).json({ message: "Hostel not found" });
     }
 
     // Check if user already rated
@@ -378,7 +379,7 @@ exports.updateRating = async (req, res) => {
     }
 
     // Recalculate average
-    const total = room.rating.details.reduce((sum, r) => sum + r.value, 0);
+    const total = hostel.rating.details.reduce((sum, r) => sum + r.value, 0);
     hostel.rating.average = parseFloat(
       (total / hostel.rating.details.length).toFixed(2)
     );
@@ -386,8 +387,9 @@ exports.updateRating = async (req, res) => {
     await hostel.save();
 
     res.status(200).json({
-      message: "Room rating updated successfully",
+      message: "Hostel rating updated successfully",
       rating: hostel.rating,
+      status: 200
     });
   } catch (error) {
     console.error("Rating error:", error);

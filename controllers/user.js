@@ -161,7 +161,9 @@ exports.delete = asyncHandler(async (req, res) => {
 
 // Update user (partial update)
 exports.update = asyncHandler(async (req, res) => {
+  
   const { name, email,  proof, phone  } = req.body;
+  
 
   // const image = req.file?.filename;
   const image = req.cloudinaryImageUrl
