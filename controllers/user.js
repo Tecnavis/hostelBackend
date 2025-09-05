@@ -51,7 +51,7 @@ exports.create = asyncHandler(async (req, res) => {
 
 
 exports.login = asyncHandler(async (req, res) => {
-  let { phone } = req.body.data;
+  let { phone } = req.body;
 
   
   // Check if customer exists

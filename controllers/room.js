@@ -9,32 +9,27 @@ exports.create = asyncHandler(async (req, res) => {
   const {
     roomNumber,
     capacity,
-    price,
     currentOccupancy,
     hostelId,
     roomType,
-    charge,
-    gardianInfo,
-    visitTimes,
-    payment,
+    amenities,
+    withFood,
+    withoutFood,
   } = req.body;
 
   if (
     !roomNumber ||
     !capacity ||
-    !price ||
     !currentOccupancy ||
     !hostelId ||
     !roomType ||
-    !charge ||
-    !payment ||
-    !gardianInfo ||
-    !visitTimes
+    !amenities ||
+    !withFood ||
+    !withoutFood
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
 
-  Number(capacity, price);
   const images = req.cloudinaryImageUrl;
 
   if (!images.length) {
@@ -46,15 +41,13 @@ exports.create = asyncHandler(async (req, res) => {
   const room = await roomModel.create({
     roomNumber,
     capacity,
-    price,
     currentOccupancy,
     hostelId,
     photos: images,
     roomType,
-    charge,
-    payment,
-    gardianInfo,
-    visitTimes,
+    amenities,
+    withFood,
+    withoutFood,
   });
 
   if (room) {
@@ -83,7 +76,9 @@ exports.getAllroom = asyncHandler(async (req, res) => {
 
 // // get all room under owner
 exports.getAll = asyncHandler(async (req, res) => {
-  const room = await roomModel.find({ hostelId: req.params.id }).populate("hostelId");
+  const room = await roomModel
+    .find({ hostelId: req.params.id })
+    .populate("hostelId");
   res.status(200).json(room);
 });
 
@@ -93,14 +88,10 @@ exports.get = asyncHandler(async (req, res) => {
   res.status(200).json(room);
 });
 
-
 exports.getAllActive = asyncHandler(async (req, res) => {
-  const room = await roomModel
-    .find({ isActive: false })
-    .populate("hostelId");
+  const room = await roomModel.find({ isActive: false }).populate("hostelId");
   res.status(200).json(room);
 });
-
 
 //delete room
 exports.delete = asyncHandler(async (req, res) => {
@@ -133,13 +124,11 @@ exports.update = asyncHandler(async (req, res) => {
   const {
     roomNumber,
     capacity,
-    price,
     currentOccupancy,
     roomType,
-    payment,
-    charge,
-    visitTimes,
-    gardianInfo,
+    amenities,
+    withFood,
+    withoutFood,
   } = req.body;
 
   const room = await roomModel.findById(req.params.id);
@@ -149,13 +138,24 @@ exports.update = asyncHandler(async (req, res) => {
 
   room.roomNumber = roomNumber;
   room.capacity = capacity;
-  room.price = price;
   room.currentOccupancy = currentOccupancy;
   room.roomType = roomType;
-  room.payment = payment;
-  room.charge = charge;
-  room.visitTimes = visitTimes;
-  room.gardianInfo = gardianInfo;
+  room.withFood = withFood;
+  room.withoutFood = withoutFood;
+
+  const parseField = (field) => {
+    if (!field) return [];
+    if (Array.isArray(field)) return field;
+    try {
+      const parsed = JSON.parse(field);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      return [field];
+    }
+  };
+
+  // ✅ Update amenities, transportation, restaurants, nearbyPlaces
+  room.amenities = parseField(amenities);
 
   // ✅ Combine existing & new photos
   let existing = [];
@@ -171,8 +171,6 @@ exports.update = asyncHandler(async (req, res) => {
 
   res.status(200).json({ status: 200, message: "Room updated", room });
 });
-
-
 
 // block and unblock room
 

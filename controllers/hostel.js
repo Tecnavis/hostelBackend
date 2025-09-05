@@ -4,7 +4,6 @@ const notficationModel = require("../models/notfication");
 const adminModel = require("../models/admin");
 const roomModel = require("../models/room");
 
-
 //create hostel
 exports.create = asyncHandler(async (req, res) => {
   const {
@@ -22,6 +21,13 @@ exports.create = asyncHandler(async (req, res) => {
     price,
     superAdminId,
     googleMap,
+    visitorsAllow,
+    noticePeriod,
+    gateOpenTime,
+    gateCloseTime,
+    restrictions,
+    gardianInfo,
+    additionalFee,
   } = req.body;
   
 
@@ -38,7 +44,13 @@ exports.create = asyncHandler(async (req, res) => {
     !transportation ||
     !restaurants ||
     !nearbyPlaces ||
-    !googleMap
+    !googleMap ||
+    !visitorsAllow ||
+    !noticePeriod ||
+    !gateOpenTime ||
+    !restrictions ||
+    !gardianInfo ||
+    !gateCloseTime
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -65,6 +77,13 @@ exports.create = asyncHandler(async (req, res) => {
     nearbyPlaces,
     photos: images,
     googleMap,
+    visitorsAllow,
+    noticePeriod,
+    gateOpenTime,
+    restrictions,
+    gardianInfo,
+     additionalFee,
+      gateCloseTime
   });
 
   if (!hostel) {
@@ -109,12 +128,9 @@ exports.getAll = asyncHandler(async (req, res) => {
 });
 
 exports.getAllActive = asyncHandler(async (req, res) => {
-  const hostel = await hostelModel
-    .find({ isActive: true })
-    .populate("ownerId");
+  const hostel = await hostelModel.find({ isActive: true }).populate("ownerId");
   res.status(200).json(hostel);
 });
-
 
 //get by Id
 exports.get = asyncHandler(async (req, res) => {
@@ -126,12 +142,9 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete hostel
 exports.delete = asyncHandler(async (req, res) => {
-
-  
   const hostel = await hostelModel.findByIdAndDelete(req.params.id);
-  
-   await roomModel.findByIdAndDelete({ hostelId : req.params.id });
-  
+
+  await roomModel.findByIdAndDelete({ hostelId: req.params.id });
 
   const admin = await adminModel.findOne({ role: "super-admin" });
 
@@ -242,6 +255,13 @@ exports.update = asyncHandler(async (req, res) => {
     ownerId,
     existingPhotos,
     googleMap,
+    visitorsAllow,
+    noticePeriod,
+    gateOpenTime,
+    restrictions,
+    gardianInfo,
+     additionalFee,
+      gateCloseTime
   } = req.body;
 
   const newImages = req.cloudinaryImageUrl || [];
@@ -250,8 +270,6 @@ exports.update = asyncHandler(async (req, res) => {
   if (!hostel) {
     return res.status(404).json({ message: "Hostel not found" });
   }
-
-  
 
   // Basic fields
   if (name) hostel.name = name;
@@ -262,6 +280,16 @@ exports.update = asyncHandler(async (req, res) => {
   if (category) hostel.category = category;
   if (ownerId) hostel.ownerId = ownerId;
   if (googleMap) hostel.googleMap = googleMap;
+  if (visitorsAllow) hostel.visitorsAllow = visitorsAllow;
+  if (noticePeriod) hostel.noticePeriod = noticePeriod;
+  if (gateOpenTime) hostel.gateOpenTime = gateOpenTime;
+  if( gateCloseTime) hostel.gateCloseTime =  gateCloseTime;
+  if (restrictions) hostel.restrictions = restrictions;
+  if( additionalFee) hostel.additionalFee =  additionalFee;
+  if (gardianInfo) {
+    if (gardianInfo.name) hostel.gardianInfo.name = gardianInfo.name;
+    if (gardianInfo.phone) hostel.gardianInfo.phone = gardianInfo.phone;
+  }
 
   if (location) {
     if (location.street) hostel.location.street = location.street;
@@ -313,7 +341,6 @@ exports.update = asyncHandler(async (req, res) => {
   });
 });
 
-
 // block and unblock hostel
 
 exports.block = async (req, res) => {
@@ -350,7 +377,7 @@ exports.block = async (req, res) => {
 exports.updateRating = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const { userId, ratingValue } = req.body.data;
 
     if (!ratingValue || ratingValue < 1 || ratingValue > 5) {
@@ -389,7 +416,7 @@ exports.updateRating = async (req, res) => {
     res.status(200).json({
       message: "Hostel rating updated successfully",
       rating: hostel.rating,
-      status: 200
+      status: 200,
     });
   } catch (error) {
     console.error("Rating error:", error);

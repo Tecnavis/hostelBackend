@@ -6,21 +6,20 @@ const roomSchema = new mongoose.Schema(
     roomNumber: { type: String, required: true },
     roomType: { type: String, required: true },
     capacity: { type: Number, required: true },
-    price: { type: Number, required: true },
-    charge: { type: String },
-    payment: { type: String, required: true },
+    // price: { type: Number, required: true },
+    // charge: { type: String },
+    // payment: { type: String, required: true },
     currentOccupancy: { type: Number, default: 0 }, // how many people are currently in the room (e.g., shared rooms or dorms).
     isOccupied: { type: Boolean, default: false },
     photos: [String],
-    gardianInfo: {
-      name: { type: String },
-      email: {
-        type: String,
-        unique: true,
+     amenities: [
+      {
+        name: { type: String, required: true },
+        icon: { type: String, required: true },
       },
-      phone: { type: String },
-    },
-    visitTimes: [String],
+    ],
+    withFood: { type: String, required: true },
+    withoutFood: { type: String, required: true },
     rating: {
       average: { type: Number, default: 0 },
       count: { type: Number, default: 0 },
