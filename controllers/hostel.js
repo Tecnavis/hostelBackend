@@ -142,9 +142,10 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete hostel
 exports.delete = asyncHandler(async (req, res) => {
+  
   const hostel = await hostelModel.findByIdAndDelete(req.params.id);
 
-  await roomModel.findByIdAndDelete({ hostelId: req.params.id });
+  await roomModel.deleteMany({ hostelId: req.params.id });  
 
   const admin = await adminModel.findOne({ role: "super-admin" });
 

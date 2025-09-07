@@ -100,10 +100,12 @@ exports.getAll = asyncHandler(async (req, res) => {
 // get all booking under owner
 exports.getAllUserBooking = asyncHandler(async (req, res) => {
   const userId = req.params.id;
-
+  
   const bookings = await bookingModel
     .find({userId: userId}).populate("hostelId");
 
+    console.log(bookin);
+    
   res.status(200).json(bookings);
 });
 
