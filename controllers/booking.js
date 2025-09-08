@@ -103,8 +103,6 @@ exports.getAllUserBooking = asyncHandler(async (req, res) => {
   
   const bookings = await bookingModel
     .find({userId: userId}).populate("hostelId");
-
-    console.log(bookin);
     
   res.status(200).json(bookings);
 });

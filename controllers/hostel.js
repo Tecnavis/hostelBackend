@@ -28,6 +28,7 @@ exports.create = asyncHandler(async (req, res) => {
     restrictions,
     gardianInfo,
     additionalFee,
+    fulltimeWarden,
   } = req.body;
   
 
@@ -50,7 +51,8 @@ exports.create = asyncHandler(async (req, res) => {
     !gateOpenTime ||
     !restrictions ||
     !gardianInfo ||
-    !gateCloseTime
+    !gateCloseTime ||
+    !fulltimeWarden
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -83,7 +85,8 @@ exports.create = asyncHandler(async (req, res) => {
     restrictions,
     gardianInfo,
      additionalFee,
-      gateCloseTime
+      gateCloseTime,
+      fulltimeWarden
   });
 
   if (!hostel) {
@@ -262,7 +265,8 @@ exports.update = asyncHandler(async (req, res) => {
     restrictions,
     gardianInfo,
      additionalFee,
-      gateCloseTime
+      gateCloseTime,
+      fulltimeWarden
   } = req.body;
 
   const newImages = req.cloudinaryImageUrl || [];
@@ -282,6 +286,7 @@ exports.update = asyncHandler(async (req, res) => {
   if (ownerId) hostel.ownerId = ownerId;
   if (googleMap) hostel.googleMap = googleMap;
   if (visitorsAllow) hostel.visitorsAllow = visitorsAllow;
+  if( fulltimeWarden) hostel.fulltimeWarden = fulltimeWarden;
   if (noticePeriod) hostel.noticePeriod = noticePeriod;
   if (gateOpenTime) hostel.gateOpenTime = gateOpenTime;
   if( gateCloseTime) hostel.gateCloseTime =  gateCloseTime;

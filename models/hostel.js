@@ -78,6 +78,7 @@ const hostelSchema = new mongoose.Schema(
       ],
     },
     visitorsAllow: {type: Boolean, default: false},
+    fulltimeWarden: {type: Boolean, default: false},
     noticePeriod: {type: String, required: true},
     gateOpenTime: {type: String},
     gateCloseTime: {type: String},
