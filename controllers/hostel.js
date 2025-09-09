@@ -29,8 +29,9 @@ exports.create = asyncHandler(async (req, res) => {
     gardianInfo,
     additionalFee,
     fulltimeWarden,
+    registrationFee,
+    refund,
   } = req.body;
-  
 
   if (
     !name ||
@@ -52,7 +53,9 @@ exports.create = asyncHandler(async (req, res) => {
     !restrictions ||
     !gardianInfo ||
     !gateCloseTime ||
-    !fulltimeWarden
+    !fulltimeWarden ||
+    !registrationFee ||
+    !refund
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
@@ -84,9 +87,11 @@ exports.create = asyncHandler(async (req, res) => {
     gateOpenTime,
     restrictions,
     gardianInfo,
-     additionalFee,
-      gateCloseTime,
-      fulltimeWarden
+    additionalFee,
+    gateCloseTime,
+    fulltimeWarden,
+    registrationFee,
+    refund,
   });
 
   if (!hostel) {
@@ -145,10 +150,9 @@ exports.get = asyncHandler(async (req, res) => {
 
 //delete hostel
 exports.delete = asyncHandler(async (req, res) => {
-  
   const hostel = await hostelModel.findByIdAndDelete(req.params.id);
 
-  await roomModel.deleteMany({ hostelId: req.params.id });  
+  await roomModel.deleteMany({ hostelId: req.params.id });
 
   const admin = await adminModel.findOne({ role: "super-admin" });
 
@@ -264,9 +268,11 @@ exports.update = asyncHandler(async (req, res) => {
     gateOpenTime,
     restrictions,
     gardianInfo,
-     additionalFee,
-      gateCloseTime,
-      fulltimeWarden
+    additionalFee,
+    gateCloseTime,
+    fulltimeWarden,
+    registrationFee,
+    refund,
   } = req.body;
 
   const newImages = req.cloudinaryImageUrl || [];
@@ -286,12 +292,14 @@ exports.update = asyncHandler(async (req, res) => {
   if (ownerId) hostel.ownerId = ownerId;
   if (googleMap) hostel.googleMap = googleMap;
   if (visitorsAllow) hostel.visitorsAllow = visitorsAllow;
-  if( fulltimeWarden) hostel.fulltimeWarden = fulltimeWarden;
+  if (fulltimeWarden) hostel.fulltimeWarden = fulltimeWarden;
   if (noticePeriod) hostel.noticePeriod = noticePeriod;
   if (gateOpenTime) hostel.gateOpenTime = gateOpenTime;
-  if( gateCloseTime) hostel.gateCloseTime =  gateCloseTime;
+  if (gateCloseTime) hostel.gateCloseTime = gateCloseTime;
   if (restrictions) hostel.restrictions = restrictions;
-  if( additionalFee) hostel.additionalFee =  additionalFee;
+  if (additionalFee) hostel.additionalFee = additionalFee;
+  if (registrationFee) hostel.registrationFee = registrationFee;
+  if (refund) hostel.refund = refund;
   if (gardianInfo) {
     if (gardianInfo.name) hostel.gardianInfo.name = gardianInfo.name;
     if (gardianInfo.phone) hostel.gardianInfo.phone = gardianInfo.phone;

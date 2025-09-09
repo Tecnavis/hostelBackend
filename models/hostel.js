@@ -83,11 +83,13 @@ const hostelSchema = new mongoose.Schema(
     gateOpenTime: {type: String},
     gateCloseTime: {type: String},
     additionalFee: {type: String},
+    registrationFee: {type: String},
     restrictions: [String],
         gardianInfo: {
       name: { type: String },
       phone: { type: String },
     },
+    refund: {type: Boolean, default: false},
     isDelete: {
       type: Boolean,
       default: false,
