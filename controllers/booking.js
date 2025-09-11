@@ -26,6 +26,7 @@ exports.create = asyncHandler(async (req, res) => {
   // Fetch hostel details
   const hostel = await hostelModel.findById(hostelId);
 
+
   if (hostel) {
     await notficationModel.create({
       adminId: hostel?.superAdminId,
@@ -33,6 +34,9 @@ exports.create = asyncHandler(async (req, res) => {
       message: `New booking created at ${hostel.name}. Current status: ${booking?.status}.`,
     });
   }
+
+    hostel.bookingCount += 1; 
+    hostel.save();
 
   return res.status(201).json({ message: "Booking created", status: 201 });
 });

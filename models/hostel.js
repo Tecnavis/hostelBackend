@@ -102,6 +102,10 @@ const hostelSchema = new mongoose.Schema(
       type:  String,
       required: true,
     },
+    bookingCount: {
+      type: Number,
+      default: 0
+    }
   },
   { timestamps: true }
 );
