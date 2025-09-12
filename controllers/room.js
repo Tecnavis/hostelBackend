@@ -82,6 +82,18 @@ exports.getAll = asyncHandler(async (req, res) => {
   res.status(200).json(room);
 });
 
+
+exports.getAllSuperAdminOwnerRooms = asyncHandler(async (req, res) => {
+
+  const room = await roomModel
+    .find()
+    .populate("hostelId");    
+
+   const rooms =  room?.filter(val => val?.hostelId?.ownerId ==  req.params.id);   
+
+  res.status(200).json(rooms);
+});
+
 //get by Id
 exports.get = asyncHandler(async (req, res) => {
   const room = await roomModel.findById(req.params.id).populate("hostelId");

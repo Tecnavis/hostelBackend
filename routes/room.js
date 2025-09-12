@@ -8,6 +8,7 @@ router.post('/', uploadImageArray, Controller.create);
 router.get('/hostels/:id', Controller.getAll);
 router.get("/", Controller.getAllroom);
 // router.get("/active", Controller.getAllActive);
+router.get('/owner/:id', Controller.getAllSuperAdminOwnerRooms);
 router.get('/:id', Controller.get);
 router.put('/:id', uploadImageArray, Controller.update);
 router.delete('/:id/hostels/:hostelId', Controller.delete);
