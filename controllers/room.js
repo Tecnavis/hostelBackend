@@ -19,13 +19,8 @@ exports.create = asyncHandler(async (req, res) => {
 
   if (
     !roomNumber ||
-    !capacity ||
-    !currentOccupancy ||
     !hostelId ||
-    !roomType ||
-    !amenities ||
-    !withFood ||
-    !withoutFood
+    !roomType   
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }

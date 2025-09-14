@@ -51,9 +51,9 @@ exports.create = asyncHandler(async (req, res) => {
 
 
 exports.login = asyncHandler(async (req, res) => {
-  let { phone } = req.body;
+  let { phone } = req.body.data;
 
-  
+    
   // Check if customer exists
   const user = await UserModel.findOne({ phone });
   
@@ -162,7 +162,8 @@ exports.delete = asyncHandler(async (req, res) => {
 // Update user (partial update)
 exports.update = asyncHandler(async (req, res) => {
   
-  const { name, email,  proof, phone  } = req.body;
+
+  const { name, email,  proof, phone,   existingPhotos  } = req.body;
   
 
   // const image = req.file?.filename;
@@ -191,6 +192,12 @@ exports.update = asyncHandler(async (req, res) => {
   }
   if (image) user.image = image;
   if(phone) user.phone = phone;
+if (existingPhotos && existingPhotos !== "{}") {
+  // remove wrapping quotes if present
+  const cleanPhoto = existingPhotos.replace(/^"(.*)"$/, "$1");
+  
+  user.image = cleanPhoto;
+}
 
   const updatedUser = await user.save();
 

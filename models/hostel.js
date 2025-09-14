@@ -15,40 +15,39 @@ const hostelSchema = new mongoose.Schema(
     },
     gst: { type: String },
     photos: [String],
-    accommodationType: { type: String, required: true },
-    description: { type: String, required: true },
+    accommodationType: { type: String,  },
+    description: { type: String, },
     amenities: [
       {
-        name: { type: String, required: true },
-        icon: { type: String, required: true },
+        name: { type: String, },
+        icon: { type: String, },
       },
     ],
     transportation: [
       {
-        name: { type: String, required: true },
-        icon: { type: String, required: true },
-        far: { type: String, required: true },
+        name: { type: String,},
+        icon: { type: String,},
+        far: { type: String, },
       },
     ],
     restaurants: [
       {
-        name: { type: String, required: true },
-        icon: { type: String, required: true },
-        far: { type: String, required: true },
+        name: { type: String,},
+        icon: { type: String,},
+        far: { type: String, },
       },
     ],
     nearbyPlaces: [
       {
-        name: { type: String, required: true },
-        icon: { type: String, required: true },
-        far: { type: String, required: true },
+        name: { type: String,},
+        icon: { type: String,},
+        far: { type: String, },
       },
     ],
 
     // e.g., ['WiFi', 'Laundry', 'Parking']
     category: {
       type: String,
-      required: true,
     },
     price: { type: String, required: true },
     superAdminId: {
@@ -79,7 +78,7 @@ const hostelSchema = new mongoose.Schema(
     },
     visitorsAllow: {type: Boolean, default: false},
     fulltimeWarden: {type: Boolean, default: false},
-    noticePeriod: {type: String, required: true},
+    noticePeriod: {type: String, },
     gateOpenTime: {type: String},
     gateCloseTime: {type: String},
     additionalFee: {type: String},
@@ -100,7 +99,6 @@ const hostelSchema = new mongoose.Schema(
     },
     googleMap: {
       type:  String,
-      required: true,
     },
     bookingCount: {
       type: Number,

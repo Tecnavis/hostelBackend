@@ -5,7 +5,7 @@ const roomSchema = new mongoose.Schema(
     hostelId: { type: mongoose.Schema.Types.ObjectId, ref: "Hostel" },
     roomNumber: { type: String, required: true },
     roomType: { type: String, required: true },
-    capacity: { type: Number, required: true },
+    capacity: { type: Number },
     // price: { type: Number, required: true },
     // charge: { type: String },
     // payment: { type: String, required: true },
@@ -14,12 +14,12 @@ const roomSchema = new mongoose.Schema(
     photos: [String],
      amenities: [
       {
-        name: { type: String, required: true },
-        icon: { type: String, required: true },
+        name: { type: String,},
+        icon: { type: String,},
       },
     ],
-    withFood: { type: String, required: true },
-    withoutFood: { type: String, required: true },
+    withFood: { type: String,  },
+    withoutFood: { type: String, },
     rating: {
       average: { type: Number, default: 0 },
       count: { type: Number, default: 0 },

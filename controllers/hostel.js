@@ -35,27 +35,13 @@ exports.create = asyncHandler(async (req, res) => {
 
   if (
     !name ||
-    !phone ||
-    !location ||
-    !description ||
-    !amenities ||
+    !phone || 
     !category ||
     !ownerId ||
     !accommodationType ||
-    !price ||
-    !transportation ||
-    !restaurants ||
-    !nearbyPlaces ||
-    !googleMap ||
-    !visitorsAllow ||
-    !noticePeriod ||
-    !gateOpenTime ||
-    !restrictions ||
-    !gardianInfo ||
-    !gateCloseTime ||
-    !fulltimeWarden ||
-    !registrationFee ||
-    !refund
+    !price  ||
+    !location
+    
   ) {
     return res.status(400).json({ message: "Please add all fields" });
   }
