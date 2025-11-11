@@ -31,7 +31,7 @@ var app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:7861", "https://hostel-dashboard-48qp.onrender.com", "http://localhost:3000", "http://localhost:3001", "https://hosta-client-56u3.vercel.app", "https://hosta-client.onrender.com", "https://admin.hostay.org"],
+  origin: ["http://localhost:5173", "http://localhost:7861", "http://localhost:3000", "http://localhost:3001", "https://hostel-dashboard-36st.onrender.com", "https://admin.hostay.org"],
   methods: ["PUT", "DELETE", "POST", "GET", "PATCH"],
   credentials: true
 }));
