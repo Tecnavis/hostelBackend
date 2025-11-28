@@ -2,8 +2,10 @@ const UserModel = require("../models/user");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const nodemailer =  require("nodemailer");
 const otpStorage = new Map();
 const twilio = require("twilio");
+
 require("dotenv").config();
 
 
@@ -51,11 +53,14 @@ exports.create = asyncHandler(async (req, res) => {
 
 
 exports.login = asyncHandler(async (req, res) => {
+  
   let { phone } = req.body.data;
 
+  
     
   // Check if customer exists
   const user = await UserModel.findOne({ phone });
+  
   
   
   if (!user) {
@@ -209,3 +214,94 @@ if (existingPhotos && existingPhotos !== "{}") {
       status: 200,
     });
 });
+
+
+
+
+
+exports.sendMail = async (req, res) => {
+  try {
+    const { name, phone, email, message } = req.body;
+  
+
+
+    const cleanedPhone = phone.startsWith("0") ? phone.slice(1) : phone;
+    if (!/^\d{10}$/.test(cleanedPhone)) {
+      return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
+    }
+
+    // Validate required fields
+    if (!name || !email || !message) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, and message are required fields."
+      });
+    }
+
+    // Configure transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    // Define mail options for admin notification
+    const adminMailOptions = {
+      from: email, // Visitor's email as sender
+      to: "hostahealthcare@gmail.com", // Your admin email
+      subject: `New Contact Form Submission from ${name}`,
+      html: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong></p>
+        <p>${message}</p>
+        <hr>
+        <p>This message was sent from your website contact form.</p>
+      `
+    };
+
+    // Define mail options for auto-reply to user
+    const userMailOptions = {
+      from: "hostahealthcare@gmail.com",
+      to: email,
+      subject: "Thank you for contacting Hostay",
+      html: `
+        <h2>Thank you for your message!</h2>
+        <p>Dear ${name},</p>
+        <p>We have received your message and will get back to you within 24 hours.</p>
+        <p><strong>Your message:</strong></p>
+        <p>${message}</p>
+        <hr>
+        <p>Best regards,<br>Hostay Team</p>
+        <p>Phone: +919496086080<br>Email: Hostayofficial@gmail.com</p>
+      `
+    };
+
+    // Send email to admin
+    const adminInfo = await transporter.sendMail(adminMailOptions);
+    console.log('Admin email sent:', adminInfo.response);
+
+    // Send auto-reply to user
+    const userInfo = await transporter.sendMail(userMailOptions);
+    console.log('User auto-reply sent:', userInfo.response);
+
+    // Respond with success message
+    return res.status(200).json({
+      success: true,
+      message: "Email sent successfully! We'll get back to you soon.",
+      info: adminInfo.response
+    });
+
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send email. Please try again later.",
+      error: error.message
+    });
+  }
+};

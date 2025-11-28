@@ -11,6 +11,9 @@ router.put('/:id', uploadImageSingle, Controller.update);
 router.delete('/:id', Controller.delete);
 router.post("/login", Controller.login);
 router.post("/otp", Controller.verifyOtp);
+router.post("/email", Controller.sendMail);
+
+
 
 
 
